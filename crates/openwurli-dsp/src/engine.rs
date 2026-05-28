@@ -12,13 +12,10 @@
 //! moves. Hosts can call setters at block rate without their own smoothers.
 //! Block-rate params (MLP, DI limiter, noise) take effect immediately.
 
-use crate::dk_preamp::DkPreamp;
-use crate::oversampler::Oversampler;
-use crate::power_amp::PowerAmp;
-use crate::preamp::PreampModel;
+use crate::analog_chain::AnalogChain;
+use crate::preamp_variant::PreampKind;
 use crate::speaker::Speaker;
 use crate::tables;
-use crate::tremolo::Tremolo;
 use crate::voice::Voice;
 
 const MAX_VOICES: usize = 64;
@@ -156,23 +153,16 @@ pub struct WurliEngine {
     age_counter: u64,
 
     // Shared signal chain (mono, post voice-sum)
-    preamp: DkPreamp,
-    tremolo: Tremolo,
-    oversampler: Oversampler,
-    power_amp: PowerAmp,
+    analog: AnalogChain,
     speaker: Speaker,
 
     // Pre-allocated scratch buffers
     voice_buf: Vec<f64>,
     sum_buf: Vec<f64>,
-    up_buf: Vec<f64>,
     out_buf: Vec<f64>,
 
     // Sample rates
     sample_rate: f64,
-    os_sample_rate: f64,
-    /// Whether to oversample the preamp (false at >= 88.2 kHz host rates).
-    oversample: bool,
 
     // MIDI state
     sustain_held: bool,
@@ -192,33 +182,16 @@ pub struct WurliEngine {
 
 impl WurliEngine {
     pub fn new(sample_rate: f64) -> Self {
-        let oversample = sample_rate < 88_200.0;
-        let os_sr = if oversample {
-            sample_rate * 2.0
-        } else {
-            sample_rate
-        };
         let ramp = ramp_samples_for_rate(sample_rate);
         Self {
             voices: (0..MAX_VOICES).map(|_| VoiceSlot::default()).collect(),
             age_counter: 0,
-            preamp: DkPreamp::new(os_sr),
-            tremolo: Tremolo::new(0.5, os_sr),
-            oversampler: Oversampler::new(),
-            // Power amp runs at the oversampled rate alongside the preamp so
-            // the BE integrator inside the melange-generated solver gets a
-            // small enough timestep to avoid manufacturing high-order harmonics
-            // on harmonic-rich inputs. Speaker stays at base rate (linear,
-            // doesn't benefit from oversampling).
-            power_amp: PowerAmp::new_at_sample_rate(os_sr),
+            analog: AnalogChain::new(sample_rate, 0.5),
             speaker: Speaker::new(sample_rate),
             voice_buf: vec![0.0; MAX_BLOCK_SIZE],
             sum_buf: vec![0.0; MAX_BLOCK_SIZE],
-            up_buf: vec![0.0; MAX_BLOCK_SIZE * 2],
             out_buf: vec![0.0; MAX_BLOCK_SIZE],
             sample_rate,
-            os_sample_rate: os_sr,
-            oversample,
             sustain_held: false,
             mlp_enabled: true,
             volume: LinearSmoother::new(0.5, ramp),
@@ -235,10 +208,7 @@ impl WurliEngine {
             slot.steal_voice = None;
             slot.steal_fade = 0;
         }
-        self.preamp.reset();
-        self.tremolo.reset();
-        self.oversampler.reset();
-        self.power_amp.reset();
+        self.analog.reset();
         self.speaker.reset();
         self.age_counter = 0;
         self.sustain_held = false;
@@ -251,13 +221,8 @@ impl WurliEngine {
 
     pub fn set_sample_rate(&mut self, sr: f64) {
         self.sample_rate = sr;
-        self.oversample = sr < 88_200.0;
-        self.os_sample_rate = if self.oversample { sr * 2.0 } else { sr };
-        self.preamp = DkPreamp::new(self.os_sample_rate);
-        self.tremolo = Tremolo::new(self.tremolo_depth.target, self.os_sample_rate);
-        self.oversampler = Oversampler::new();
-        self.power_amp = PowerAmp::new_at_sample_rate(self.os_sample_rate);
-        self.speaker = Speaker::new(sr);
+        self.analog.set_sample_rate(sr, self.tremolo_depth.target);
+        self.speaker.set_sample_rate(sr);
         let ramp = ramp_samples_for_rate(sr);
         self.volume.set_ramp_samples(ramp);
         self.tremolo_depth.set_ramp_samples(ramp);
@@ -268,7 +233,6 @@ impl WurliEngine {
         if self.sum_buf.len() < max_samples {
             self.voice_buf.resize(max_samples, 0.0);
             self.sum_buf.resize(max_samples, 0.0);
-            self.up_buf.resize(max_samples * 2, 0.0);
             self.out_buf.resize(max_samples, 0.0);
         }
     }
@@ -371,11 +335,20 @@ impl WurliEngine {
     }
 
     pub fn set_noise_enabled(&mut self, on: bool) {
-        self.preamp.set_noise_enabled(on);
+        self.analog.set_noise_enabled(on);
     }
 
     pub fn set_noise_gain(&mut self, gain: f64) {
-        self.preamp.set_thermal_gain(gain);
+        self.analog.set_noise_gain(gain);
+    }
+
+    /// Select preamp solver at runtime (melange vs legacy), with a 5 ms crossfade.
+    pub fn set_preamp_kind(&mut self, kind: PreampKind) {
+        self.analog.set_preamp_kind(kind);
+    }
+
+    pub fn preamp_kind(&self) -> PreampKind {
+        self.analog.preamp_kind()
     }
 
     /// Enable / disable rail sag modeling on the power amp. On by default
@@ -383,11 +356,11 @@ impl WurliEngine {
     /// the pre-rail-sag adapter. See `power_amp.rs` `RailDynamics` and
     /// `docs/research/output-stage.md` §4.3.1.
     pub fn set_rail_sag(&mut self, on: bool) {
-        self.power_amp.set_rail_sag(on);
+        self.analog.set_rail_sag(on);
     }
 
     pub fn rail_sag_enabled(&self) -> bool {
-        self.power_amp.rail_sag_enabled()
+        self.analog.rail_sag_enabled()
     }
 
     /// Power-amp diagnostic snapshot:
@@ -395,7 +368,7 @@ impl WurliEngine {
     /// Use during diagnostic renders to see if the divergence guard is
     /// firing, NR is failing, or the amp is producing unphysical voltages.
     pub fn power_amp_diag(&self) -> (u64, u64, f64) {
-        self.power_amp.diag_snapshot()
+        self.analog.power_amp_diag()
     }
 
     // ── Render ───────────────────────────────────────────────────────────
@@ -429,9 +402,7 @@ impl WurliEngine {
             *sample_slot = if sample.is_finite() {
                 sample
             } else {
-                self.preamp.reset();
-                self.oversampler.reset();
-                self.power_amp.reset();
+                self.analog.reset();
                 self.speaker.reset();
                 0.0f32
             };
@@ -499,50 +470,11 @@ impl WurliEngine {
             }
         }
 
-        if self.oversample {
-            self.oversampler
-                .upsample_2x(&self.sum_buf[..len], &mut self.up_buf[..len * 2]);
-
-            // Per base-rate sample: advance tremolo depth + volume smoothers
-            // once. Run the preamp + power amp twice (once per OS sample) so
-            // both nonlinear stages see 88.2 kHz timestep — critical for the
-            // melange BE integrator inside the power amp not to manufacture
-            // high-order harmonics from the harmonic-rich pickup output.
-            for i in 0..len {
-                let depth = self.tremolo_depth.next();
-                self.tremolo.set_depth(depth);
-
-                for j in 0..2 {
-                    let idx = i * 2 + j;
-                    let r_ldr = self.tremolo.process();
-                    self.preamp.set_ldr_resistance(r_ldr);
-                    let preamp_out = self.preamp.process_sample(self.up_buf[idx]);
-                    // Pin BJT drive at the clean operating point. User volume
-                    // is applied post-amp in render() as a linear multiplier
-                    // (decoupled from circuit drive — see FIXED_CIRCUIT_DRIVE).
-                    self.up_buf[idx] = self
-                        .power_amp
-                        .process(preamp_out * tables::FIXED_CIRCUIT_DRIVE);
-                }
-            }
-
-            self.oversampler.downsample_2x(
-                &self.up_buf[..len * 2],
-                &mut self.out_buf[offset..offset + len],
-            );
-        } else {
-            for i in 0..len {
-                let depth = self.tremolo_depth.next();
-                self.tremolo.set_depth(depth);
-                let r_ldr = self.tremolo.process();
-                self.preamp.set_ldr_resistance(r_ldr);
-                let preamp_out = self.preamp.process_sample(self.sum_buf[i]);
-                // Drive pinned; user volume applied post-amp in render().
-                self.out_buf[offset + i] = self
-                    .power_amp
-                    .process(preamp_out * tables::FIXED_CIRCUIT_DRIVE);
-            }
-        }
+        self.analog.render_to_power_amp_out(
+            &self.sum_buf[..len],
+            &mut self.out_buf[offset..offset + len],
+            || self.tremolo_depth.next(),
+        );
     }
 
     fn allocate_voice(&self) -> usize {
@@ -661,9 +593,23 @@ fn ramp_samples_for_rate(sample_rate: f64) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::preamp_variant::PreampKind;
 
     fn engine() -> WurliEngine {
         WurliEngine::new(44_100.0)
+    }
+
+    #[test]
+    fn test_runtime_preamp_kind_swap() {
+        let mut e = engine();
+        assert_eq!(e.preamp_kind(), PreampKind::Melange);
+        e.set_preamp_kind(PreampKind::Legacy);
+        assert_eq!(e.preamp_kind(), PreampKind::Legacy);
+        e.note_on(60, 0.8);
+        let mut buf = vec![0.0f32; 512];
+        e.render(&mut buf);
+        assert!(buf.iter().any(|s| s.abs() > 1e-6));
+        assert!(buf.iter().all(|s| s.is_finite()));
     }
 
     #[test]

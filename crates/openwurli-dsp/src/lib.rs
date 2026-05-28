@@ -13,11 +13,14 @@ pub mod variation;
 pub mod voice;
 
 // Preamp circuit simulation (melange-generated DK solver)
+pub mod analog_chain;
 pub mod dk_preamp;
 pub mod dk_preamp_legacy;
 pub mod gen_preamp;
 pub mod oversampler;
 pub mod preamp;
+pub mod preamp_variant;
+pub mod stages;
 pub mod tremolo;
 
 // Output stage

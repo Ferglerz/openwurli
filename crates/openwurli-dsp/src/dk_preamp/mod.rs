@@ -4,11 +4,11 @@
 //! correction. Settles at 100K nominal, tremolo sweeps smoothly.
 //! `--features legacy-preamp`: hand-written 8-node MNA solver (for A/B testing).
 
+pub mod melange_adapter;
+
 #[cfg(feature = "legacy-preamp")]
 pub use crate::dk_preamp_legacy::DkPreamp;
 
-#[cfg(not(feature = "legacy-preamp"))]
-mod melange_adapter;
 #[cfg(not(feature = "legacy-preamp"))]
 pub use melange_adapter::DkPreamp;
 

@@ -126,6 +126,15 @@ impl Speaker {
         self.lpf.reset();
         self.thermal_state = 0.0;
     }
+
+    pub fn set_sample_rate(&mut self, sample_rate: f64) {
+        self.sample_rate = sample_rate;
+        self.hpf = Biquad::highpass(HPF_AUTHENTIC_HZ, HPF_Q, sample_rate);
+        self.lpf = Biquad::lowpass(LPF_AUTHENTIC_HZ, LPF_Q, sample_rate);
+        self.thermal_alpha = 1.0 / (THERMAL_TAU * sample_rate);
+        self.update_coefficients();
+        self.reset();
+    }
 }
 
 #[cfg(test)]

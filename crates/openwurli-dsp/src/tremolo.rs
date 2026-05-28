@@ -165,6 +165,24 @@ impl Tremolo {
     }
 }
 
+impl crate::stages::LdrModulator for Tremolo {
+    fn process(&mut self) -> f64 {
+        Tremolo::process(self)
+    }
+
+    fn set_depth(&mut self, depth: f64) {
+        Tremolo::set_depth(self, depth);
+    }
+
+    fn reset(&mut self) {
+        Tremolo::reset(self);
+    }
+
+    fn set_sample_rate(&mut self, _sample_rate: f64) {
+        // Rate changes rebuild the whole Tremolo in `AnalogChain::set_sample_rate`.
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
