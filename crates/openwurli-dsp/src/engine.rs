@@ -1,8 +1,9 @@
 //! WurliEngine — synth engine extracted from `openwurli-plugin`.
 //!
 //! Owns voice management (slots, allocation, stealing, sustain pedal)
-//! and the shared signal chain (preamp → fixed circuit drive → power amp
-//! → speaker → PSG × user volume). Framework-agnostic so any host
+//! and the shared signal chain via [`AnalogChain`] (tremolo-modulated preamp
+//! → fixed circuit drive → power amp) then speaker → PSG × user volume.
+//! Framework-agnostic so any host
 //! (nih-plug, custom DAW integration, oomox/Vurli) can wrap it without
 //! copying voice or signal-chain code.
 //!
