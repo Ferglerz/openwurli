@@ -91,6 +91,22 @@ pub struct Oversampler {
     down_delay: f64,
 }
 
+pub const OVERSAMPLE_THRESHOLD_HZ: f64 = 88_200.0;
+
+#[inline]
+pub fn should_oversample(sample_rate: f64) -> bool {
+    sample_rate < OVERSAMPLE_THRESHOLD_HZ
+}
+
+#[inline]
+pub fn effective_oversampled_rate(sample_rate: f64) -> f64 {
+    if should_oversample(sample_rate) {
+        sample_rate * 2.0
+    } else {
+        sample_rate
+    }
+}
+
 impl Oversampler {
     pub fn new() -> Self {
         Self {

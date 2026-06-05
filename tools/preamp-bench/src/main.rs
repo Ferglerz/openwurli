@@ -12,6 +12,8 @@
 use std::f64::consts::PI;
 use std::io::Write;
 
+mod output_stage;
+mod preamp_stage;
 use openwurli_dsp::dk_preamp::DkPreamp;
 use openwurli_dsp::hammer::{dwell_attenuation, onset_ramp_time};
 use openwurli_dsp::oversampler::Oversampler;
@@ -425,59 +427,21 @@ fn cmd_render(args: &[String]) {
         };
 
         let mut out = vec![0.0f64; n_samples];
-        if do_oversample {
-            let mut os = Oversampler::new();
-            for i in 0..n_samples {
-                let mut up = [0.0f64; 2];
-                os.upsample_2x(&[reed_output[i]], &mut up);
-                let processed = [
-                    {
-                        if let Some(ref mut trem) = tremolo {
-                            preamp.set_ldr_resistance(trem.process());
-                        }
-                        preamp.process_sample(up[0])
-                    },
-                    {
-                        if let Some(ref mut trem) = tremolo {
-                            preamp.set_ldr_resistance(trem.process());
-                        }
-                        preamp.process_sample(up[1])
-                    },
-                ];
-                let mut down = [0.0f64; 1];
-                os.downsample_2x(&processed, &mut down);
-                out[i] = down[0];
-            }
-        } else {
-            // Native rate: no oversampling needed
-            for i in 0..n_samples {
-                if let Some(ref mut trem) = tremolo {
-                    preamp.set_ldr_resistance(trem.process());
-                }
-                out[i] = preamp.process_sample(reed_output[i]);
-            }
-        }
+        let mut block = preamp_stage::PreampRenderBlock::new(&mut preamp, do_oversample, tremolo);
+        block.process_buffer(&reed_output, &mut out);
         out
     };
 
-    // Output stage: volume → power amp (gain + crossover + clip) → speaker
-    let mut power_amp = PowerAmp::new();
-    if no_rail_sag {
-        power_amp.set_rail_sag(false);
-    }
-    let mut speaker = Speaker::new(sample_rate);
-    speaker.set_character(speaker_char);
-
-    let mut final_output = vec![0.0f64; n_samples];
-    for i in 0..n_samples {
-        let attenuated = preamp_output[i] * volume * volume; // audio taper
-        let amplified = if no_poweramp {
-            attenuated
-        } else {
-            power_amp.process(attenuated)
-        };
-        final_output[i] = speaker.process(amplified) * tables::POST_SPEAKER_GAIN;
-    }
+    let final_output = output_stage::render_output_stage_with_models(
+        &preamp_output,
+        output_stage::OutputStageRenderConfig {
+            sample_rate,
+            volume,
+            speaker_char,
+            no_poweramp,
+            no_rail_sag,
+        },
+    );
 
     // Peak measurement
     let peak = peak_abs(&final_output);
@@ -943,17 +907,9 @@ fn write_wav_24bit(path: &str, samples: &[f64], sample_rate: f64, scale: f64) {
 // ─── Oversampled preamp processing ──────────────────────────────────────────
 
 fn process_oversampled(input: &[f64], preamp: &mut dyn PreampModel) -> Vec<f64> {
-    let n = input.len();
-    let mut os = Oversampler::new();
-    let mut out = vec![0.0f64; n];
-    for i in 0..n {
-        let mut up = [0.0f64; 2];
-        os.upsample_2x(&[input[i]], &mut up);
-        let processed = [preamp.process_sample(up[0]), preamp.process_sample(up[1])];
-        let mut down = [0.0f64; 1];
-        os.downsample_2x(&processed, &mut down);
-        out[i] = down[0];
-    }
+    let mut out = vec![0.0f64; input.len()];
+    let mut block = preamp_stage::PreampRenderBlock::new(preamp, true, None);
+    block.process_buffer(input, &mut out);
     out
 }
 
@@ -1886,21 +1842,16 @@ fn cmd_centroid_track(args: &[String]) {
         process_oversampled(&reed_output, preamp.as_mut())
     };
 
-    // Output stage
-    let mut power_amp = PowerAmp::new();
-    let mut speaker = Speaker::new(BASE_SR);
-    speaker.set_character(speaker_char);
-
-    let mut final_output = vec![0.0f64; n_samples];
-    for i in 0..n_samples {
-        let attenuated = preamp_output[i] * volume * volume; // audio taper
-        let amplified = if no_poweramp {
-            attenuated
-        } else {
-            power_amp.process(attenuated)
-        };
-        final_output[i] = speaker.process(amplified) * tables::POST_SPEAKER_GAIN;
-    }
+    let final_output = output_stage::render_output_stage_with_models(
+        &preamp_output,
+        output_stage::OutputStageRenderConfig {
+            sample_rate: BASE_SR,
+            volume,
+            speaker_char,
+            no_poweramp,
+            no_rail_sag: false,
+        },
+    );
 
     // Centroid tracking with Hann-windowed frames
     let window_samples = ((window_ms / 1000.0) * BASE_SR) as usize;

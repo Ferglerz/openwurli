@@ -13,7 +13,7 @@
 //! Block-rate params (MLP, DI limiter, noise) take effect immediately.
 
 use crate::dk_preamp::DkPreamp;
-use crate::oversampler::Oversampler;
+use crate::oversampler::{effective_oversampled_rate, should_oversample, Oversampler};
 use crate::power_amp::PowerAmp;
 use crate::preamp::PreampModel;
 use crate::speaker::Speaker;
@@ -192,12 +192,8 @@ pub struct WurliEngine {
 
 impl WurliEngine {
     pub fn new(sample_rate: f64) -> Self {
-        let oversample = sample_rate < 88_200.0;
-        let os_sr = if oversample {
-            sample_rate * 2.0
-        } else {
-            sample_rate
-        };
+        let oversample = should_oversample(sample_rate);
+        let os_sr = effective_oversampled_rate(sample_rate);
         let ramp = ramp_samples_for_rate(sample_rate);
         Self {
             voices: (0..MAX_VOICES).map(|_| VoiceSlot::default()).collect(),
@@ -251,8 +247,8 @@ impl WurliEngine {
 
     pub fn set_sample_rate(&mut self, sr: f64) {
         self.sample_rate = sr;
-        self.oversample = sr < 88_200.0;
-        self.os_sample_rate = if self.oversample { sr * 2.0 } else { sr };
+        self.oversample = should_oversample(sr);
+        self.os_sample_rate = effective_oversampled_rate(sr);
         self.preamp = DkPreamp::new(self.os_sample_rate);
         self.tremolo = Tremolo::new(self.tremolo_depth.target, self.os_sample_rate);
         self.oversampler = Oversampler::new();
