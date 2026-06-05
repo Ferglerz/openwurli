@@ -12,14 +12,14 @@
 //! moves. Hosts can call setters at block rate without their own smoothers.
 //! Block-rate params (MLP, DI limiter, noise) take effect immediately.
 
-use crate::dk_preamp::DkPreamp;
-use crate::oversampler::{effective_oversampled_rate, should_oversample, Oversampler};
-use crate::power_amp::PowerAmp;
-use crate::preamp::PreampModel;
-use crate::speaker::Speaker;
-use crate::tables;
-use crate::tremolo::Tremolo;
-use crate::voice::Voice;
+use crate::circuit::dk_preamp::DkPreamp;
+use crate::dsp::oversampler::{effective_oversampled_rate, should_oversample, Oversampler};
+use crate::circuit::power_amp::PowerAmp;
+use crate::circuit::preamp::PreampModel;
+use crate::circuit::speaker::Speaker;
+use crate::physics::tables;
+use crate::circuit::tremolo::Tremolo;
+use crate::physics::voice::Voice;
 
 const MAX_VOICES: usize = 64;
 const MAX_BLOCK_SIZE: usize = 8192;

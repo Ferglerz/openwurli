@@ -3,8 +3,8 @@
 //! Standalone CLI tool for rendering reed tones to WAV files.
 //! Uses physics-derived parameters from docs/research/reed-and-hammer-physics.md.
 
-use openwurli_dsp::tables;
-use openwurli_dsp::voice::Voice;
+use openwurli_dsp::physics::tables;
+use openwurli_dsp::physics::voice::Voice;
 
 const SAMPLE_RATE: f64 = 44100.0;
 
@@ -95,7 +95,7 @@ fn main() {
 
             let samples = Voice::render_note(midi_note, velocity_f, duration, SAMPLE_RATE);
 
-            let peak = samples.iter().map(|x| x.abs()).fold(0.0f64, f64::max);
+            let peak = samples.iter().map(|x: &f64| x.abs()).fold(0.0f64, f64::max);
             eprintln!(
                 "  Peak amplitude: {peak:.6} ({:.1} dBFS)",
                 20.0 * peak.log10()

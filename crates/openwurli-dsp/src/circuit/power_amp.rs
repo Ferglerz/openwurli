@@ -279,7 +279,7 @@ pub use behavioral::PowerAmp;
 mod melange_adapter {
     //! Melange-generated 7-BJT Class AB circuit solver.
 
-    use crate::gen_power_amp::{self, CircuitState};
+    use crate::circuit::gen_power_amp::{self, CircuitState};
     use std::sync::OnceLock;
 
     /// Rail headroom for output normalization (matches behavioral model).

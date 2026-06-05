@@ -5,8 +5,8 @@
 //! the next `process_sample` does a lazy rebuild before the NR solve.
 //! max_iter=200 for convergence across the full R_ldr range (1K-1M).
 
-use crate::gen_preamp::{self, CircuitState};
-use crate::preamp::PreampModel;
+use crate::circuit::gen_preamp::{self, CircuitState};
+use crate::circuit::preamp::PreampModel;
 use std::sync::OnceLock;
 
 static SETTLED_STATE: OnceLock<CircuitState> = OnceLock::new();

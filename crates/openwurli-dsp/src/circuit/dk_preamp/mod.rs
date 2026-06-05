@@ -5,7 +5,7 @@
 //! `--features legacy-preamp`: hand-written 8-node MNA solver (for A/B testing).
 
 #[cfg(feature = "legacy-preamp")]
-pub use crate::dk_preamp_legacy::DkPreamp;
+pub use crate::circuit::dk_preamp_legacy::DkPreamp;
 
 #[cfg(not(feature = "legacy-preamp"))]
 mod melange_adapter;
@@ -14,8 +14,8 @@ pub use melange_adapter::DkPreamp;
 
 #[cfg(test)]
 mod melange_gate_tests {
-    use crate::gen_preamp::{self, CircuitState};
-    use crate::preamp::PreampModel; // needed for leg_gain() trait method calls
+    use crate::circuit::gen_preamp::{self, CircuitState};
+    use crate::circuit::preamp::PreampModel; // needed for leg_gain() trait method calls
     use std::f64::consts::PI;
     use std::sync::OnceLock;
 
@@ -75,7 +75,7 @@ mod melange_gate_tests {
     }
 
     fn leg_gain(freq: f64, r_ldr: f64, amp: f64) -> f64 {
-        let mut leg = crate::dk_preamp_legacy::DkPreamp::new(SR);
+        let mut leg = crate::circuit::dk_preamp_legacy::DkPreamp::new(SR);
         leg.set_ldr_resistance(r_ldr);
         let settle = (SR * 0.5) as usize;
         for i in 0..settle {
@@ -116,7 +116,7 @@ mod melange_gate_tests {
     /// DkPreamp adapter so shadow-pump cancellation is active (plugin path).
     #[test]
     fn test_ldr_sweep_no_clicks() {
-        let mut preamp = crate::dk_preamp::DkPreamp::new(SR);
+        let mut preamp = crate::circuit::dk_preamp::DkPreamp::new(SR);
         let freq = 1000.0_f64;
         let amp = 0.3_f64;
 
@@ -170,7 +170,7 @@ mod melange_gate_tests {
     /// oscillation at or near Nyquist would violate the bound.
     #[test]
     fn test_no_nyquist_limit_cycle() {
-        let mut preamp = crate::dk_preamp::DkPreamp::new(SR);
+        let mut preamp = crate::circuit::dk_preamp::DkPreamp::new(SR);
         preamp.set_ldr_resistance(1_000_000.0);
 
         // Warm up — the adapter's cached settled state is at SAMPLE_RATE,
@@ -234,7 +234,7 @@ mod melange_gate_tests {
     /// zero-crossings around its mean).
     #[test]
     fn test_tremolo_am_depth_at_full_depth() {
-        use crate::tremolo::Tremolo;
+        use crate::circuit::tremolo::Tremolo;
 
         const PREAMP_SR: f64 = 88_200.0; // 2x oversampled at 44.1 kHz host rate
         const TONE_HZ: f64 = 1_000.0;
@@ -244,7 +244,7 @@ mod melange_gate_tests {
         const ENV_WIN_S: f64 = 0.005;
 
         fn render(depth: f64) -> Vec<f64> {
-            let mut preamp = crate::dk_preamp::DkPreamp::new(PREAMP_SR);
+            let mut preamp = crate::circuit::dk_preamp::DkPreamp::new(PREAMP_SR);
             let mut tremolo = Tremolo::new(depth, PREAMP_SR);
             tremolo.set_depth(depth);
 
@@ -403,8 +403,8 @@ mod melange_gate_tests {
     #[test]
     #[ignore]
     fn phase5_noise_floor() {
-        use crate::dk_preamp::DkPreamp;
-        use crate::preamp::PreampModel;
+        use crate::circuit::dk_preamp::DkPreamp;
+        use crate::circuit::preamp::PreampModel;
 
         const SR: f64 = 88_200.0;
         const SETTLE: usize = 44_100;

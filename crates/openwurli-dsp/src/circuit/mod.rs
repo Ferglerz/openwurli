@@ -1,0 +1,10 @@
+pub mod dk_preamp_legacy;
+pub mod gen_power_amp;
+pub mod gen_preamp;
+#[cfg(not(feature = "legacy-tremolo"))]
+pub mod gen_tremolo;
+pub mod power_amp;
+pub mod preamp;
+pub mod speaker;
+pub mod tremolo;
+pub mod dk_preamp;

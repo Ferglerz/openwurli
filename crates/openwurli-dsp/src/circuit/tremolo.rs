@@ -9,7 +9,7 @@
 use std::f64::consts::PI;
 
 #[cfg(not(feature = "legacy-tremolo"))]
-use crate::gen_tremolo;
+use crate::circuit::gen_tremolo;
 
 /// CdS LDR parameters (shared between behavioral and circuit paths).
 const ATTACK_TAU: f64 = 0.003;

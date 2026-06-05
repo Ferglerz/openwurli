@@ -14,17 +14,17 @@ use std::io::Write;
 
 mod output_stage;
 mod preamp_stage;
-use openwurli_dsp::dk_preamp::DkPreamp;
-use openwurli_dsp::hammer::{dwell_attenuation, onset_ramp_time};
-use openwurli_dsp::oversampler::Oversampler;
-use openwurli_dsp::power_amp::PowerAmp;
-use openwurli_dsp::preamp::PreampModel;
-use openwurli_dsp::reed::ModalReed;
-use openwurli_dsp::speaker::Speaker;
-use openwurli_dsp::tables::{self, CalibrationConfig, NUM_MODES};
-use openwurli_dsp::tremolo::Tremolo;
-use openwurli_dsp::variation;
-use openwurli_dsp::voice::Voice;
+use openwurli_dsp::circuit::dk_preamp::DkPreamp;
+use openwurli_dsp::physics::hammer::{dwell_attenuation, onset_ramp_time};
+use openwurli_dsp::dsp::oversampler::Oversampler;
+use openwurli_dsp::circuit::power_amp::PowerAmp;
+use openwurli_dsp::circuit::preamp::PreampModel;
+use openwurli_dsp::physics::reed::ModalReed;
+use openwurli_dsp::circuit::speaker::Speaker;
+use openwurli_dsp::physics::tables::{self, CalibrationConfig, NUM_MODES};
+use openwurli_dsp::circuit::tremolo::Tremolo;
+use openwurli_dsp::physics::variation;
+use openwurli_dsp::physics::voice::Voice;
 
 const BASE_SR: f64 = 44100.0;
 const OVERSAMPLED_SR: f64 = BASE_SR * 2.0;
@@ -122,7 +122,7 @@ fn create_preamp(args: &[String]) -> Box<dyn PreampModel> {
     match model {
         "dk" => Box::new(DkPreamp::new(OVERSAMPLED_SR)),
         #[cfg(feature = "legacy-preamp")]
-        "dk-legacy" => Box::new(openwurli_dsp::dk_preamp_legacy::DkPreamp::new(
+        "dk-legacy" => Box::new(openwurli_dsp::circuit::dk_preamp_legacy::DkPreamp::new(
             OVERSAMPLED_SR,
         )),
         other => {
@@ -505,7 +505,7 @@ fn cmd_render(args: &[String]) {
 ///   2. After pickup (time-varying RC — coupled NL + HPF)
 ///   3. After preamp (oversampled)
 fn cmd_bark_audit(args: &[String]) {
-    use openwurli_dsp::pickup::Pickup;
+    use openwurli_dsp::physics::pickup::Pickup;
 
     let notes: Vec<u8> = parse_csv_list(args, "--notes", "36,48,60,72,84");
     let velocities: Vec<u8> = parse_csv_list(args, "--velocities", "40,80,100,127");
@@ -984,7 +984,7 @@ fn run_calibrate(
     _mlp: bool,
     args: &[String],
 ) -> Vec<CalibrateRow> {
-    use openwurli_dsp::pickup::Pickup;
+    use openwurli_dsp::physics::pickup::Pickup;
 
     let duration = 0.5;
     let measure_start = (0.100 * BASE_SR) as usize; // 100ms

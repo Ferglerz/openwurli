@@ -14,7 +14,7 @@
 //! See docs/research/dk-preamp-derivation.md for the full mathematical derivation.
 #![allow(clippy::needless_range_loop)]
 
-use crate::preamp::PreampModel;
+use crate::circuit::preamp::PreampModel;
 
 // ── Circuit constants ───────────────────────────────────────────────────────
 
@@ -1963,7 +1963,7 @@ mod tests {
     /// With zero input, main and shadow produce identical pump; subtraction cancels exactly.
     #[test]
     fn test_idle_pump_level() {
-        use crate::tremolo::Tremolo;
+        use crate::circuit::tremolo::Tremolo;
 
         let os_sr = 88200.0;
         let mut preamp = DkPreamp::new(os_sr);

@@ -1,6 +1,6 @@
-use openwurli_dsp::power_amp::PowerAmp;
-use openwurli_dsp::speaker::Speaker;
-use openwurli_dsp::tables;
+use openwurli_dsp::circuit::power_amp::PowerAmp;
+use openwurli_dsp::circuit::speaker::Speaker;
+use openwurli_dsp::physics::tables;
 
 #[derive(Debug, Clone, Copy)]
 pub struct OutputStageRenderConfig {

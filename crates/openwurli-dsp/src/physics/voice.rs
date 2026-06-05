@@ -2,12 +2,12 @@
 //!
 //! Signal flow: modal_oscillator -> pickup_hpf -> output
 //! Attack noise mixed in during first ~15 ms.
-use crate::hammer::{AttackNoise, dwell_attenuation, onset_ramp_time};
-use crate::mlp_correction::MlpCorrections;
-use crate::pickup::Pickup;
-use crate::reed::ModalReed;
-use crate::tables::{self, NUM_MODES};
-use crate::variation;
+use crate::physics::hammer::{AttackNoise, dwell_attenuation, onset_ramp_time};
+use crate::physics::mlp_correction::MlpCorrections;
+use crate::physics::pickup::Pickup;
+use crate::physics::reed::ModalReed;
+use crate::physics::tables::{self, NUM_MODES};
+use crate::physics::variation;
 
 pub struct Voice {
     reed: ModalReed,

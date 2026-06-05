@@ -1,6 +1,6 @@
-use openwurli_dsp::oversampler::Oversampler;
-use openwurli_dsp::preamp::PreampModel;
-use openwurli_dsp::tremolo::Tremolo;
+use openwurli_dsp::dsp::oversampler::Oversampler;
+use openwurli_dsp::circuit::preamp::PreampModel;
+use openwurli_dsp::circuit::tremolo::Tremolo;
 
 pub struct PreampRenderBlock<'a> {
     preamp: &'a mut dyn PreampModel,

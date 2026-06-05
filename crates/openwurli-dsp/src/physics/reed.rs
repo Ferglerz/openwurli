@@ -15,7 +15,7 @@
 
 use std::f64::consts::{PI, TAU};
 
-use crate::tables::NUM_MODES;
+use crate::physics::tables::NUM_MODES;
 
 /// RMS frequency jitter as fraction of mode frequency (~0.04% = 4 cents peak).
 const JITTER_SIGMA: f64 = 0.0004;

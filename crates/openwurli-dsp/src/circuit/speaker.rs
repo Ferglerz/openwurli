@@ -17,7 +17,7 @@
 /// "Speaker Character" parameter blends from bypass (flat, linear) to authentic
 /// (full nonlinearity + HPF + LPF). At character=0.0 all nonlinearity
 /// coefficients are zero — pure linear passthrough.
-use crate::filters::Biquad;
+use crate::dsp::filters::Biquad;
 
 /// HPF cutoff at fully authentic position.
 const HPF_AUTHENTIC_HZ: f64 = 95.0;

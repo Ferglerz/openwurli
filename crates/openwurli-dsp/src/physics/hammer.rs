@@ -7,8 +7,8 @@
 //! The attack noise is an exponentially decaying bandpass-filtered noise burst
 //! that models the mechanical impact transient.
 
-use crate::filters::Biquad;
-use crate::tables::NUM_MODES;
+use crate::dsp::filters::Biquad;
+use crate::physics::tables::NUM_MODES;
 
 /// Hammer dwell time (contact duration) in seconds — for spectral filtering only.
 ///

@@ -4,7 +4,7 @@
 //! solder mass, and mounting characteristics. This module provides fixed
 //! per-note offsets so note 60 always sounds the same, but differs
 //! slightly from note 61.
-use crate::tables::NUM_MODES;
+use crate::physics::tables::NUM_MODES;
 
 /// Simple deterministic hash: takes MIDI note + seed, returns 0.0..1.0.
 fn hash_f64(midi: u8, seed: u32) -> f64 {
