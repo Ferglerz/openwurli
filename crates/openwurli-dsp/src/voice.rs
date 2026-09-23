@@ -18,6 +18,28 @@ pub struct Voice {
     midi_note: u8,
 }
 
+/// Optional note-on voicing controls. Unity values reproduce the original
+/// OpenWurli voice exactly; settings are captured when a note starts.
+#[derive(Clone, Copy, Debug)]
+pub struct VoiceCharacter {
+    /// Higher values lengthen the natural reed decay.
+    pub reed_decay: f64,
+    /// Higher values reduce high-mode hammer dwell attenuation.
+    pub hammer_hardness: f64,
+    /// Scales reed motion at the nonlinear pickup.
+    pub pickup_drive: f64,
+}
+
+impl Default for VoiceCharacter {
+    fn default() -> Self {
+        Self {
+            reed_decay: 1.0,
+            hammer_hardness: 1.0,
+            pickup_drive: 1.0,
+        }
+    }
+}
+
 impl Voice {
     /// Initialize a voice for a given note and velocity.
     ///
@@ -32,6 +54,26 @@ impl Voice {
         noise_seed: u32,
         mlp_enabled: bool,
     ) -> Self {
+        Self::note_on_with_character(
+            midi_note,
+            velocity,
+            sample_rate,
+            noise_seed,
+            mlp_enabled,
+            VoiceCharacter::default(),
+        )
+    }
+
+    /// Construct a voice with host-selected voicing. Existing voices retain
+    /// their previous settings so automation never jumps mid-note.
+    pub fn note_on_with_character(
+        midi_note: u8,
+        velocity: f64,
+        sample_rate: f64,
+        noise_seed: u32,
+        mlp_enabled: bool,
+        character: VoiceCharacter,
+    ) -> Self {
         let params = tables::note_params(midi_note);
 
         let detuned_fundamental = params.fundamental_hz * variation::freq_detune(midi_note);
@@ -42,7 +84,12 @@ impl Voice {
 
         let mut amplitudes = [0.0f64; NUM_MODES];
         for (i, amp) in amplitudes.iter_mut().enumerate() {
-            *amp = params.mode_amplitudes[i] * dwell[i] * amp_offsets[i];
+            let hammer_shape = if character.hammer_hardness == 1.0 {
+                dwell[i]
+            } else {
+                dwell[i].powf(1.0 / character.hammer_hardness)
+            };
+            *amp = params.mode_amplitudes[i] * hammer_shape * amp_offsets[i];
         }
 
         // Sigmoid → power-law velocity curve (physical hammer force — pre-pickup).
@@ -82,9 +129,14 @@ impl Voice {
         {
             *decay /= ratio;
         }
+        for decay in &mut corrected_decay {
+            *decay /= character.reed_decay;
+        }
 
         // Apply displacement scale correction (from H2/H1 ratio matching)
-        let corrected_ds = tables::pickup_displacement_scale(midi_note) * corrections.ds_correction;
+        let corrected_ds = tables::pickup_displacement_scale(midi_note)
+            * corrections.ds_correction
+            * character.pickup_drive;
 
         let reed = ModalReed::new(
             detuned_fundamental,
@@ -228,6 +280,56 @@ impl Voice {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn neutral_character_matches_original_voice() {
+        let mut original = Voice::note_on(60, 0.8, 44_100.0, 42, false);
+        let mut neutral =
+            Voice::note_on_with_character(60, 0.8, 44_100.0, 42, false, VoiceCharacter::default());
+        let mut a = [0.0; 1024];
+        let mut b = [0.0; 1024];
+        original.render(&mut a);
+        neutral.render(&mut b);
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn character_controls_change_the_rendered_note() {
+        let baseline = VoiceCharacter::default();
+        let mut reference = Voice::note_on_with_character(60, 0.8, 44_100.0, 42, false, baseline);
+        let mut expected = [0.0; 8192];
+        reference.render(&mut expected);
+
+        for character in [
+            VoiceCharacter {
+                reed_decay: 2.0,
+                ..baseline
+            },
+            VoiceCharacter {
+                hammer_hardness: 2.0,
+                ..baseline
+            },
+            VoiceCharacter {
+                pickup_drive: 1.5,
+                ..baseline
+            },
+        ] {
+            let mut changed =
+                Voice::note_on_with_character(60, 0.8, 44_100.0, 42, false, character);
+            let mut actual = [0.0; 8192];
+            changed.render(&mut actual);
+            let difference: f64 = expected
+                .iter()
+                .zip(actual.iter())
+                .map(|(a, b)| (a - b).abs())
+                .sum();
+            assert!(
+                difference > 1e-6,
+                "character {character:?} had no audible-path effect"
+            );
+            assert!(actual.iter().all(|sample| sample.is_finite()));
+        }
+    }
 
     #[test]
     fn test_render_note_produces_audio() {

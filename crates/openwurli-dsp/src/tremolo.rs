@@ -140,6 +140,7 @@ pub struct Tremolo {
     ldr_envelope: f64,
     ldr_attack: f64,
     ldr_release: f64,
+    response_multiplier: f64,
     r_ldr_max: f64,
     gamma: f64,
     ln_r_max: f64,
@@ -209,6 +210,7 @@ impl Tremolo {
             ldr_envelope: 0.0,
             ldr_attack: (-1.0 / (ATTACK_TAU * sample_rate)).exp(),
             ldr_release: (-1.0 / (RELEASE_TAU * sample_rate)).exp(),
+            response_multiplier: 1.0,
             r_ldr_max: R_LDR_MAX,
             gamma: GAMMA,
             ln_r_max: R_LDR_MAX.ln(),
@@ -223,6 +225,22 @@ impl Tremolo {
 
     pub fn set_depth(&mut self, depth: f64) {
         self.depth = depth.clamp(0.0, 1.0);
+    }
+
+    /// Scale the CdS cell's attack/release time constants without changing
+    /// the Twin-T oscillator. Unity retains the circuit's nominal response.
+    pub fn set_response_multiplier(&mut self, multiplier: f64) {
+        let multiplier = if multiplier.is_finite() {
+            multiplier.clamp(0.5, 2.0)
+        } else {
+            1.0
+        };
+        if multiplier == self.response_multiplier {
+            return;
+        }
+        self.response_multiplier = multiplier;
+        self.ldr_attack = (-1.0 / (ATTACK_TAU * multiplier * self.sample_rate)).exp();
+        self.ldr_release = (-1.0 / (RELEASE_TAU * multiplier * self.sample_rate)).exp();
     }
 
     pub fn process(&mut self) -> f64 {
@@ -345,6 +363,22 @@ impl Tremolo {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn response_multiplier_changes_ldr_timing_without_changing_depth() {
+        let mut trem = Tremolo::new(0.5, 44_100.0);
+        let normal_attack = trem.ldr_attack;
+        let normal_release = trem.ldr_release;
+        trem.set_response_multiplier(2.0);
+        assert!(trem.ldr_attack > normal_attack);
+        assert!(trem.ldr_release > normal_release);
+        assert_eq!(trem.depth, 0.5);
+        trem.reset();
+        assert_eq!(trem.response_multiplier, 2.0);
+        trem.set_response_multiplier(1.0);
+        assert_eq!(trem.ldr_attack, normal_attack);
+        assert_eq!(trem.ldr_release, normal_release);
+    }
 
     #[test]
     #[ignore]

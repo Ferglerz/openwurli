@@ -19,7 +19,7 @@ use crate::preamp::PreampModel;
 use crate::speaker::Speaker;
 use crate::tables;
 use crate::tremolo::Tremolo;
-use crate::voice::Voice;
+use crate::voice::{Voice, VoiceCharacter};
 
 const MAX_VOICES: usize = 64;
 const MAX_BLOCK_SIZE: usize = 8192;
@@ -189,6 +189,8 @@ pub struct WurliEngine {
     // MIDI state
     sustain_held: bool,
     mlp_enabled: bool,
+    voice_character: VoiceCharacter,
+    tremolo_response: f64,
 
     // Smoothed audio-rate params (target set by host, ramped per sample)
     volume: LinearSmoother,
@@ -239,6 +241,8 @@ impl WurliEngine {
             oversample,
             sustain_held: false,
             mlp_enabled: false,
+            voice_character: VoiceCharacter::default(),
+            tremolo_response: 1.0,
             volume: LinearSmoother::new(0.5, ramp),
             tremolo_depth: LinearSmoother::new(0.5, ramp),
             speaker_character: LinearSmoother::new(0.0, ramp),
@@ -293,6 +297,7 @@ impl WurliEngine {
         self.os_sample_rate = if self.oversample { sr * 2.0 } else { sr };
         self.preamp = DkPreamp::new(self.os_sample_rate);
         self.tremolo = Tremolo::new(self.tremolo_depth.target, self.os_sample_rate);
+        self.tremolo.set_response_multiplier(self.tremolo_response);
         self.oversampler = Oversampler::new();
         self.power_amp = PowerAmp::new_at_sample_rate(self.os_sample_rate);
         self.speaker = Speaker::new(sr);
@@ -343,12 +348,13 @@ impl WurliEngine {
         let noise_seed = (note as u32)
             .wrapping_mul(2654435761)
             .wrapping_add(self.age_counter as u32);
-        slot.voice = Some(Voice::note_on(
+        slot.voice = Some(Voice::note_on_with_character(
             note,
             velocity as f64,
             self.sample_rate,
             noise_seed,
             self.mlp_enabled,
+            self.voice_character,
         ));
         slot.state = VoiceState::Held;
         slot.midi_note = note;
@@ -407,6 +413,27 @@ impl WurliEngine {
 
     pub fn set_mlp_enabled(&mut self, on: bool) {
         self.mlp_enabled = on;
+    }
+
+    /// Note-on controls affect new notes only. Existing voices keep their
+    /// excitation and decay parameters until released.
+    pub fn set_reed_decay(&mut self, multiplier: f64) {
+        self.voice_character.reed_decay = bounded_multiplier(multiplier);
+    }
+
+    pub fn set_hammer_hardness(&mut self, multiplier: f64) {
+        self.voice_character.hammer_hardness = bounded_multiplier(multiplier);
+    }
+
+    pub fn set_pickup_drive(&mut self, multiplier: f64) {
+        self.voice_character.pickup_drive = bounded_multiplier(multiplier);
+    }
+
+    /// Scales the CdS cell's attack and release response time. The Twin-T
+    /// oscillator frequency and waveform remain circuit-derived.
+    pub fn set_tremolo_response(&mut self, multiplier: f64) {
+        self.tremolo_response = bounded_multiplier(multiplier);
+        self.tremolo.set_response_multiplier(self.tremolo_response);
     }
 
     pub fn set_noise_enabled(&mut self, on: bool) {
@@ -699,6 +726,14 @@ impl WurliEngine {
 
     pub fn is_sustain_held(&self) -> bool {
         self.sustain_held
+    }
+}
+
+fn bounded_multiplier(value: f64) -> f64 {
+    if value.is_finite() {
+        value.clamp(0.5, 2.0)
+    } else {
+        1.0
     }
 }
 
