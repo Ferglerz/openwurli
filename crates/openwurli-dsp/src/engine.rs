@@ -518,18 +518,24 @@ impl WurliEngine {
 
             if let Some(ref mut voice) = slot.voice {
                 voice.render(&mut self.voice_buf[..len]);
-                for i in 0..len {
-                    self.sum_buf[i] += self.voice_buf[i];
+                for (sum, sample) in self.sum_buf[..len]
+                    .iter_mut()
+                    .zip(self.voice_buf[..len].iter())
+                {
+                    *sum += *sample;
                 }
             }
 
             if let Some(ref mut steal) = slot.steal_voice {
                 steal.render(&mut self.voice_buf[..len]);
                 let fade_len = slot.steal_fade_len as f64;
-                for i in 0..len {
+                for (i, (sum, sample)) in self.sum_buf[..len]
+                    .iter_mut()
+                    .zip(self.voice_buf[..len].iter())
+                    .enumerate()
+                {
                     let remaining = slot.steal_fade.saturating_sub(i as u32);
-                    let gain = remaining as f64 / fade_len;
-                    self.sum_buf[i] += self.voice_buf[i] * gain;
+                    *sum += *sample * (remaining as f64 / fade_len);
                 }
                 slot.steal_fade = slot.steal_fade.saturating_sub(len as u32);
                 if slot.steal_fade == 0 {
