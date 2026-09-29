@@ -164,7 +164,7 @@ impl RailDynamics {
     }
 }
 
-#[cfg(feature = "legacy-power-amp")]
+#[cfg(any(feature = "legacy-power-amp", feature = "runtime-models"))]
 mod behavioral {
     //! Behavioral closed-loop negative feedback model.
 
@@ -305,7 +305,7 @@ mod behavioral {
 #[cfg(feature = "legacy-power-amp")]
 pub use behavioral::PowerAmp;
 
-#[cfg(not(feature = "legacy-power-amp"))]
+#[cfg(any(not(feature = "legacy-power-amp"), feature = "runtime-models"))]
 mod melange_adapter {
     //! Melange-generated 7-BJT Class AB circuit solver.
 
@@ -496,6 +496,11 @@ mod melange_adapter {
 
 #[cfg(not(feature = "legacy-power-amp"))]
 pub use melange_adapter::PowerAmp;
+
+#[cfg(feature = "runtime-models")]
+pub use behavioral::PowerAmp as FastPowerAmp;
+#[cfg(feature = "runtime-models")]
+pub use melange_adapter::PowerAmp as HeavyPowerAmp;
 
 #[cfg(test)]
 mod tests {

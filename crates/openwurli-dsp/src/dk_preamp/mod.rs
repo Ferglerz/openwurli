@@ -14,10 +14,15 @@
 #[cfg(not(feature = "melange-preamp"))]
 pub use crate::dk_preamp_legacy::DkPreamp;
 
-#[cfg(feature = "melange-preamp")]
+#[cfg(any(feature = "melange-preamp", feature = "runtime-models"))]
 mod melange_adapter;
 #[cfg(feature = "melange-preamp")]
 pub use melange_adapter::DkPreamp;
+
+#[cfg(feature = "runtime-models")]
+pub use crate::dk_preamp_legacy::DkPreamp as FastPreamp;
+#[cfg(feature = "runtime-models")]
+pub use melange_adapter::DkPreamp as HeavyPreamp;
 
 #[cfg(test)]
 mod melange_gate_tests {

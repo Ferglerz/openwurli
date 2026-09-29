@@ -41,6 +41,8 @@ pub mod alias_audit;
 //     use openwurli_dsp::{WurliEngine, VoiceState};
 //
 // Without these, callers would need `openwurli_dsp::engine::WurliEngine`.
+#[cfg(feature = "runtime-models")]
+pub use engine::CircuitMode;
 pub use engine::{VoiceState, WurliEngine};
 
 mod circuit_math;
