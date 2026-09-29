@@ -183,12 +183,12 @@ mod behavioral {
         rail_limit: f64,
         closed_loop_gain: f64,
         quiescent_gain: f64,
+        #[cfg(feature = "experimental-circuit-lut")]
+        tanh_table: &'static crate::circuit_lut::Table,
     }
 
     impl PowerAmp {
         pub fn new() -> Self {
-            #[cfg(feature = "experimental-circuit-lut")]
-            crate::circuit_lut::initialize();
             Self {
                 open_loop_gain: OPEN_LOOP_GAIN,
                 feedback_beta: FEEDBACK_BETA,
@@ -196,6 +196,8 @@ mod behavioral {
                 rail_limit: HEADROOM,
                 closed_loop_gain: OPEN_LOOP_GAIN / (1.0 + OPEN_LOOP_GAIN * FEEDBACK_BETA),
                 quiescent_gain: QUIESCENT_GAIN,
+                #[cfg(feature = "experimental-circuit-lut")]
+                tanh_table: crate::circuit_lut::tanh_table(),
             }
         }
 
@@ -229,7 +231,9 @@ mod behavioral {
         fn forward_path(&self, v: f64) -> (f64, f64) {
             #[cfg(feature = "experimental-circuit-lut")]
             {
-                self.forward_path_with_math(v, crate::circuit_lut::exp, crate::circuit_lut::tanh)
+                self.forward_path_with_math(v, crate::circuit_math::exp, |x| {
+                    self.tanh_table.tanh(x)
+                })
             }
             #[cfg(not(feature = "experimental-circuit-lut"))]
             {
