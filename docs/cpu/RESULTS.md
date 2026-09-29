@@ -12,8 +12,9 @@ CPU improvement claim.
 
 The broad circuit lookup-table candidate is **rejected for release**: although
 its function interpolation errors were small, it failed the agreed output
-error limits in nine of 70 controls-fork scenarios. An isolated amplifier-only
-candidate remains under investigation. Neither candidate is enabled in the
+error limits in nine of 70 controls-fork scenarios. The isolated amplifier-only
+candidate passed quick numerical limits but did not demonstrate a CPU benefit.
+Neither candidate is enabled in the
 selected release path. No listening or spectral test results are invented or
 implied by these numerical measurements.
 
@@ -41,6 +42,11 @@ The relevant source revisions are:
   the default; enabling the experiment changes numerical evaluation.
 - `9cf99766173d24ce1cbd53423cb992be5509c6f2`: integration of that branch into
   the controls fork.
+- `efc11b08c33f390ee8b44c0a4454e731f12f29af`: final clean optimization branch,
+  including the narrowed optional amplifier tanh experiment, published on the
+  Ferglerz fork as `codex/dsp-cpu-optimizations`. No upstream PR was opened.
+- `fd4f603dd8deef7a57d4449826f2c9d5dd53757e`: final integrated controls-fork
+  source used for the last native audio verification.
 
 The full benchmark ran while the optimized sources were local changes on
 `612dbda`, before the clean commits and integration were recorded. Its **source
@@ -48,6 +54,11 @@ hashes and saved working-tree patch**, not the HEAD field alone, identify the
 measured implementation. Later source cleanup or integration must not be
 misrepresented as a new full measurement. The separate actual-upstream proof
 below verifies the clean branch's native result against `3023a8a` directly.
+`native-source-reconciliation.json` additionally verifies that all **34 recorded
+Rust source files** from the full run match integrated `9cf9976` byte for byte.
+The only recorded difference is a comment-only Cargo.toml edit; features and
+dependencies are identical. Its general `all_match` field is therefore false,
+while `all_rust_source_files_match` is true.
 
 The locally fetched latest upstream is **v0.9.0**, commit `531680b`. Its changelog
 records different pickup geometry, hammer-derived reed swing, amplitude-dependent
@@ -179,6 +190,16 @@ were bit-identical, finite, and free of reported voice guards. This run was
 audio-only: it supplies no separate upstream CPU result. It is a quick matrix,
 not a claim that the 1,542-case controls-fork matrix was rerun on the clean branch.
 
+### Final integrated native confirmation
+
+After narrowing the optional LUT code, the final integrated source `fd4f603`
+was checked again with native math active. All **70 quick scenarios and
+3,235,200 samples per pair** remained bit-identical to both historical controls
+baselines, finite, and free of reported voice guards. Source hashes remained
+unchanged during this run. `final-native-quick-*` records preserve this final
+confirmation. It was audio-only; the 1,542-case full matrix and 39-case CPU
+measurements remain the earlier reconciled measurements, not new full runs.
+
 ## 4. Whole-engine CPU results
 
 Measurements use Apple M1, 8 GiB RAM, macOS 26.6.2 build 25G83,
@@ -286,19 +307,52 @@ control range behaved differently from the extended fork cases; it does not
 reverse the rejection for the consuming UI/fork. No CPU cases, listening tests,
 or dedicated harmonic/alias comparison were performed in that run.
 
-### Amplifier-only LUT: candidate decision pending
+### Amplifier-only LUT: retained for comparison, disabled by default
 
-**Not shipping; final trial pending.** The current experiment narrows the feature to
-one 2,048-segment tanh table over `[-12,12)` (64 KiB) used only in the amplifier;
-exponential, BJT, and LDR evaluation remain native. Its quick output comparison
-reported a worst peak residual of −144.49 dBFS and worst relative RMS residual
-of −178.81 dB. An eleven-repeat CPU comparison was 0.28–2.30% slower after
-normalization against the unchanged reference; that result does not justify
-promotion. A final cached-table-reference trial remains under investigation.
-Record its final source, evidence paths, bounds, spectral/alias status, and CPU
-result here before closing the candidate decision. Do not reuse the rejected
-broad candidate's measurements as proof for this narrower implementation.
-Native analytical circuit evaluation remains the release default.
+The final optional candidate limits approximation to the behavioral amplifier's
+`tanh`: a 2,048-segment cubic Hermite table over `[-12,12)` with native fallback,
+using 64 KiB of coefficients. `PowerAmp` caches the immutable table reference at
+construction to avoid a `OnceLock` lookup during each Newton evaluation.
+Exponential, BJT, and LDR evaluation remain native. The original analytical
+amplifier path remains callable; rejected broad generators remain in Git history.
+
+All **70 quick audio cases** passed the original −120 dBFS peak / −100 dB
+relative gates. Worst peak residual was **−144.4944 dBFS**; worst RMS residual
+relative to reference was **−178.8126 dB**. Sources remained unchanged during
+measurement and outputs were finite with no reported voice guards.
+
+The final CPU comparison used **eleven repetitions across seven workloads**.
+To account for run-to-run changes, the candidate/reference time ratio was
+normalized against the native run's corresponding ratio:
+`(candidate_optimized / candidate_shipping) / (native_optimized / native_shipping)`.
+The cached-table candidate was **0.01–2.55% slower by that measure**. Individual
+unnormalized medians sometimes improved, but the unchanged reference improved
+more; those isolated medians are not evidence of a useful table speedup.
+Normalization is an aid to interpreting separate runs, not a guarantee that
+thermal/scheduling/code-layout effects have been eliminated.
+
+There is no demonstrated repeatable CPU benefit to justify promotion. The
+candidate stays explicit and disabled; native math remains the release default.
+A full 1,542-case LUT qualification and dedicated spectral/alias analysis were
+not pursued after this performance result. No listening result or spectrum
+claim is made for the approximation. Future promotion requires the complete
+audio/stability matrix, spectral/alias evidence, and a repeatable CPU benefit.
+
+### Why the broad experiment diverged
+
+Isolated long-chord tests localized the large residuals to changes before or
+within the preamp: BJT-table-only peak residual was +13.08 dBFS and LDR-table-only
+was +13.27 dBFS; amplifier-table-only was −156.54 dBFS. Increasing LDR resolution
+from 2,048 to 32,768 segments still left +12.94 dBFS residual. Source inspection
+found no independently fitted LDR constants or incorrect interpolation-derivative
+wiring. A deliberately overdriven standalone diagnostic exposed nonphysical
+large-signal trajectories in the **native** preamp as well, despite only
+4.18e−8 ohm maximum difference in its driving CdS resistance. This localizes
+sensitivity; it does not map every musical input's instability boundary or
+justify accepting output changes. No solver limit or clamp was changed to make
+the candidate pass. The [full diagnosis](lut-diagnosis.md) distinguishes these
+controlled observations from earlier hypotheses, and the [archive](records/)
+retains rejected runs as well as the final candidate.
 
 ## 6. Other proposals and their dispositions
 
@@ -353,13 +407,27 @@ Run default and candidate sequentially without competing builds or benchmarks.
 not evidence for that phase. The portable actual-upstream harness uses
 `3023a8a`/`cab1a75` references and omits only fork-specific setters.
 
-The canonical fork evidence directory is `docs/cpu/records`. It retains:
+The canonical fork [evidence archive](records/) is `docs/cpu/records`. It retains:
 
 - `native-full-report.json.gz`, `native-full-provenance.json.gz`, and
   `native-full-working-tree.patch.gz` for the full accepted native comparison.
 - `lut-rejected-quick-report.json.gz`, `lut-rejected-quick-provenance.json.gz`,
   and `lut-rejected-quick-working-tree.patch.gz` for the rejected broad candidate.
+- `native-source-reconciliation.json` mapping the full measured Rust sources
+  to integrated `9cf9976`, including the comment-only manifest exception.
+- `final-native-quick-*` compressed report, provenance, and patch for the last
+  native verification on integrated `fd4f603`.
 - `reed-proof-arm64.json` for the separate f64 reed study.
+- `upstream-native-quick-*` and `upstream-lut-quick-*` compressed reports,
+  provenance, and patches for direct original-upstream checks.
+- `lut-diag-*` compressed reports, provenance, and patches for the isolated
+  amplifier/BJT/LDR experiments, larger-LDR trial, initial/compact tanh trials,
+  eleven-repeat native/candidate timings, and final cached-reference candidate.
+  Final candidate records are `lut-diag-tanh-cached-quick-*` and
+  `lut-diag-tanh-cached-cpu-*`; the CPU reference is `lut-diag-native-cpu-*`.
+- `amp-tanh-cached.patch` for the final scoped candidate and
+  `diagnostic-source/` for the two nonproduction investigation binaries that
+  were untracked and therefore absent from ordinary working-tree patches.
 
 Raw run directories additionally contain `audio.json`, `cpu.json`, combined
 `report.json`, provenance, selected unnormalized float WAVs and difference WAVs;
@@ -367,8 +435,8 @@ Raw run directories additionally contain `audio.json`, `cpu.json`, combined
 original full run is `/private/tmp/cpu-ab-native-full`; the rejected run is
 `/private/tmp/cpu-ab-lut-quick`; direct upstream runs are
 `/private/tmp/upstream-native-quick` and `/private/tmp/upstream-lut-quick`.
-Temporary paths are not durable archives: retain necessary records alongside
-this report before removing them. Amplifying a difference WAV is useful for
+Temporary paths are not durable archives. The compressed reports, provenance,
+and source patches listed above are retained with this report before cleanup. Amplifying a difference WAV is useful for
 diagnosis but is not its level during ordinary playback.
 
 Generated reference directories are gitignored and explicitly disposable after
@@ -381,12 +449,13 @@ assumed by this protocol.
 
 ## 8. UI communication and remaining limits
 
-The ENGINE view should identify native analytical processing and present the
-32/64-voice **whole-engine** figures with 48 kHz, 256-sample blocks, Apple M1,
-and the scalar baseline stated. It should distinguish the smaller incremental
-gain over the existing SIMD implementation, link this report, and show that
-experimental table processing is inactive. These are static measured release
-figures, not a callback profiler or a newly adjustable sound-quality parameter.
+The implemented ENGINE view identifies native analytical processing and displays
+**“64 voices: 15.7% less CPU vs original / 3.8% vs prior SIMD”**, with 48 kHz,
+256-sample blocks, Apple M1, and the scalar baseline stated. It describes the
+exact audio comparison and keeps experimental table processing inactive. The
+project README links this report; the in-plugin view itself has no report link.
+These are static measured release figures, not a callback profiler or a newly
+adjustable sound-quality parameter.
 
 These results establish the tested default legacy-preamp/behavioral-power-amp
 engine behavior. They do not establish equivalent results for optional generated
