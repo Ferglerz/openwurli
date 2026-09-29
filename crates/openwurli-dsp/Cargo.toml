@@ -17,6 +17,8 @@ default = ["legacy-power-amp"]
 melange-preamp = []
 legacy-tremolo = []
 legacy-power-amp = []
+# Numerical comparison candidate: retains canonical analytical functions.
+experimental-circuit-lut = []
 
 [lints.rust]
 unexpected_cfgs = { level = "allow", check-cfg = ['cfg(melange_precise_exp)'] }

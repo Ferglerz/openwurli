@@ -187,6 +187,8 @@ mod behavioral {
 
     impl PowerAmp {
         pub fn new() -> Self {
+            #[cfg(feature = "experimental-circuit-lut")]
+            crate::circuit_lut::initialize();
             Self {
                 open_loop_gain: OPEN_LOOP_GAIN,
                 feedback_beta: FEEDBACK_BETA,
@@ -225,17 +227,41 @@ mod behavioral {
 
         #[inline]
         fn forward_path(&self, v: f64) -> (f64, f64) {
+            #[cfg(feature = "experimental-circuit-lut")]
+            {
+                self.forward_path_with_math(v, crate::circuit_lut::exp, crate::circuit_lut::tanh)
+            }
+            #[cfg(not(feature = "experimental-circuit-lut"))]
+            {
+                self.forward_path_analytical(v)
+            }
+        }
+
+        /// Original native forward model, retained for focused comparisons even
+        /// when the optional table evaluator is selected for normal processing.
+        #[inline]
+        pub fn forward_path_analytical(&self, v: f64) -> (f64, f64) {
+            self.forward_path_with_math(v, crate::circuit_math::exp, crate::circuit_math::tanh)
+        }
+
+        #[inline]
+        fn forward_path_with_math(
+            &self,
+            v: f64,
+            exp: impl Fn(f64) -> (f64, f64),
+            tanh: impl Fn(f64) -> (f64, f64),
+        ) -> (f64, f64) {
             let v_sq = v * v;
             let vt_sq = self.crossover_vt * self.crossover_vt;
-            let exp_term = (-v_sq / vt_sq).exp();
+            let (exp_term, exp_derivative) = exp(-v_sq / vt_sq);
             let q = self.quiescent_gain;
             let cross_gain = q + (1.0 - q) * (1.0 - exp_term);
             let v_cross = v * cross_gain;
-            let dcross_dv = cross_gain + v * (1.0 - q) * (2.0 * v / vt_sq) * exp_term;
+            let dcross_dv = cross_gain + v * (1.0 - q) * (2.0 * v / vt_sq) * exp_derivative;
             let tanh_arg = v_cross / self.rail_limit;
-            let tanh_val = tanh_arg.tanh();
+            let (tanh_val, tanh_derivative) = tanh(tanh_arg);
             let f_val = self.rail_limit * tanh_val;
-            let f_deriv = (1.0 - tanh_val * tanh_val) * dcross_dv;
+            let f_deriv = tanh_derivative * dcross_dv;
             (f_val, f_deriv)
         }
 

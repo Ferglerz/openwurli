@@ -42,3 +42,7 @@ pub mod alias_audit;
 //
 // Without these, callers would need `openwurli_dsp::engine::WurliEngine`.
 pub use engine::{VoiceState, WurliEngine};
+
+mod circuit_math;
+#[cfg(feature = "experimental-circuit-lut")]
+mod circuit_lut;

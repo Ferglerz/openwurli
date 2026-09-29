@@ -385,6 +385,8 @@ impl DkPreamp {
     pub fn set_thermal_gain(&mut self, _gain: f64) {}
 
     pub fn new(sample_rate: f64) -> Self {
+        #[cfg(feature = "experimental-circuit-lut")]
+        crate::circuit_lut::initialize();
         let t = 1.0 / sample_rate;
         let two_over_t = 2.0 / t;
 
@@ -854,8 +856,29 @@ fn stamp_capacitor_to_gnd(c: &mut MatN, i: usize, cap: f64) {
 /// arbiter tolerance without it (worst node 2.70 mV).
 #[inline]
 fn bjt(vbe: f64) -> (f64, f64, f64, f64) {
+    #[cfg(feature = "experimental-circuit-lut")]
+    {
+        bjt_with_exp(vbe, crate::circuit_lut::exp)
+    }
+    #[cfg(not(feature = "experimental-circuit-lut"))]
+    {
+        bjt_analytical(vbe)
+    }
+}
+
+/// Original analytical BJT kernel, retained for comparisons in every build.
+/// Returns collector current, base current, and both voltage derivatives.
+#[inline]
+pub fn bjt_analytical(vbe: f64) -> (f64, f64, f64, f64) {
+    bjt_with_exp(vbe, crate::circuit_math::exp)
+}
+
+/// One physical model. Only the exponential evaluator changes; generics let the
+/// compiler specialize both paths without function-pointer dispatch per sample.
+#[inline]
+fn bjt_with_exp(vbe: f64, exp: impl Fn(f64) -> (f64, f64)) -> (f64, f64, f64, f64) {
     let v = vbe.clamp(-1.0, VBE_MAX);
-    let ef = (v / VTF).exp();
+    let (ef, def) = exp(v / VTF);
     let icc = IS * (ef - 1.0);
 
     // High injection (Gummel-Poon qb)
@@ -865,15 +888,17 @@ fn bjt(vbe: f64) -> (f64, f64, f64, f64) {
     let ic = icc / qb;
 
     // Base current: ideal + low-current recombination
-    let ee = (v / NE_VT).exp();
+    let (ee, dee) = exp(v / NE_VT);
     let ib = icc / BF + ISE * (ee - 1.0);
 
     // Derivatives
-    let dicc = IS * ef / VTF;
-    let dq2 = q2 / VTF;
+    // Native exp returns def=ef, preserving the original arithmetic. The table
+    // returns its polynomial derivative so Newton differentiates that same curve.
+    let dicc = IS * def / VTF;
+    let dq2 = (IS_OVER_IKF * def) / VTF;
     let dqb = dq2 / root;
     let gic = (dicc * qb - icc * dqb) / (qb * qb);
-    let gib = dicc / BF + ISE * ee / NE_VT;
+    let gib = dicc / BF + ISE * dee / NE_VT;
 
     (ic, ib, gic, gib)
 }
