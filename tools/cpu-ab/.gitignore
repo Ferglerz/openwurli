@@ -1,0 +1,5 @@
+# Generated from immutable refs by run.py; never commit duplicate DSP implementations.
+/scalar/
+/shipping/
+/target/
+/__pycache__/

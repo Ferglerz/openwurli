@@ -1,0 +1,110 @@
+{
+  "baselines": {
+    "scalar": {
+      "revision": "6614ab9519471e956ecb0c82edc4fcf295f724dc",
+      "mutable_modules": [
+        "dk_preamp_legacy",
+        "engine",
+        "power_amp",
+        "reed",
+        "tremolo",
+        "voice"
+      ]
+    },
+    "shipping": {
+      "revision": "612dbda54cad9a8a666aa5dc6496d73f5d5da27d",
+      "mutable_modules": [
+        "dk_preamp_legacy",
+        "engine",
+        "power_amp",
+        "reed",
+        "tremolo",
+        "voice"
+      ]
+    }
+  },
+  "shared": {
+    "crates/openwurli-dsp/src/filters.rs": {
+      "scalar": "65bc030c832b24b4df531daf513e8d1c2ed03268",
+      "shipping": "65bc030c832b24b4df531daf513e8d1c2ed03268"
+    },
+    "crates/openwurli-dsp/src/hammer.rs": {
+      "scalar": "611f08c15ff0cf63dacd7b783c3e3ade8f303a30",
+      "shipping": "611f08c15ff0cf63dacd7b783c3e3ade8f303a30"
+    },
+    "crates/openwurli-dsp/src/mlp_correction.rs": {
+      "scalar": "dcb8d58c235b60c9b35edb3edbd845f60dd5b88d",
+      "shipping": "dcb8d58c235b60c9b35edb3edbd845f60dd5b88d"
+    },
+    "crates/openwurli-dsp/src/pickup.rs": {
+      "scalar": "26545dfc1a9c9d8ea3f4bf0fe0dbc159fb2e4d05",
+      "shipping": "26545dfc1a9c9d8ea3f4bf0fe0dbc159fb2e4d05"
+    },
+    "crates/openwurli-dsp/src/tables.rs": {
+      "scalar": "fbb2a3d7a6cc1dee36efa2ea6d982c1c2a493a5d",
+      "shipping": "fbb2a3d7a6cc1dee36efa2ea6d982c1c2a493a5d"
+    },
+    "crates/openwurli-dsp/src/variation.rs": {
+      "scalar": "f716fe0148dee0ea9b7b5a9da6d13f53b05bf6c5",
+      "shipping": "f716fe0148dee0ea9b7b5a9da6d13f53b05bf6c5"
+    },
+    "crates/openwurli-dsp/src/dk_preamp/mod.rs": {
+      "scalar": "c960929a4b32a9e67cbf0c81a45ae7a387662a9a",
+      "shipping": "c960929a4b32a9e67cbf0c81a45ae7a387662a9a"
+    },
+    "crates/openwurli-dsp/src/gen_preamp.rs": {
+      "scalar": "415949f726f9467efb674d84d7b91cad5ff25b91",
+      "shipping": "415949f726f9467efb674d84d7b91cad5ff25b91"
+    },
+    "crates/openwurli-dsp/src/oversampler.rs": {
+      "scalar": "04ea63714c7d18e59cce5d766ba1b790721ebc83",
+      "shipping": "04ea63714c7d18e59cce5d766ba1b790721ebc83"
+    },
+    "crates/openwurli-dsp/src/preamp.rs": {
+      "scalar": "84d45f6f63d2feb01bcc9456f9bd2cc8c0a8ca8d",
+      "shipping": "84d45f6f63d2feb01bcc9456f9bd2cc8c0a8ca8d"
+    },
+    "crates/openwurli-dsp/src/gen_power_amp.rs": {
+      "scalar": "90ae3123ab1665546f75bd9f1a6a0c5e51ce35a0",
+      "shipping": "90ae3123ab1665546f75bd9f1a6a0c5e51ce35a0"
+    },
+    "crates/openwurli-dsp/src/gen_tremolo.rs": {
+      "scalar": "93a9740da25ba250dffbe37c4a2489a088168a76",
+      "shipping": "93a9740da25ba250dffbe37c4a2489a088168a76"
+    },
+    "crates/openwurli-dsp/src/speaker.rs": {
+      "scalar": "e4c48d2471f120abfb984cdcb499ba6b399e936c",
+      "shipping": "e4c48d2471f120abfb984cdcb499ba6b399e936c"
+    },
+    "crates/openwurli-dsp/src/alias_audit.rs": {
+      "scalar": "6bf90661249163fd89fe27c8a997bdf08c2eff48",
+      "shipping": "6bf90661249163fd89fe27c8a997bdf08c2eff48"
+    },
+    "crates/openwurli-dsp/src/mlp_weights.rs": {
+      "scalar": "508600db6c0bb30c12a6d900315a89ba0cb6955c",
+      "shipping": "508600db6c0bb30c12a6d900315a89ba0cb6955c"
+    },
+    "crates/openwurli-dsp/src/dk_preamp/melange_adapter.rs": {
+      "scalar": "8e0a890872498b33d590cb847ce7b77fecc8edbf",
+      "shipping": "8e0a890872498b33d590cb847ce7b77fecc8edbf"
+    }
+  },
+  "snapshot_sha256": {
+    "scalar/src/tremolo.rs": "d80b5702b93c055c400162302be00e6434fc7e6d637832acf66d344b76f657f5",
+    "scalar/src/lib.rs": "1c9d292da5f0a2dc8c2bbbc2b30976f984679b80dc73399bf6275a5c827f18ad",
+    "scalar/src/reed.rs": "3443f693847c73667dca83b3fd8003e33b51a17d3957c64470cab0017c68ba01",
+    "scalar/src/dk_preamp_legacy.rs": "7873721a98bf78996f76e3928c1cfc4e6f08f0764fe1329a80082c77a250d4d1",
+    "scalar/src/power_amp.rs": "960990327fb0525904227b0a57e878ed7375080c8dcb5dd77ab0855cf6f5ff23",
+    "scalar/src/voice.rs": "619d2bf5c6a739318a07094b38b98dee47818b2ffa9439341b2a0439e74eece7",
+    "scalar/src/engine.rs": "eb542ae14ee4923c2a37ac692d9b8a57e8ed5956a4f7f703422519035a851295",
+    "shipping/src/tremolo.rs": "d80b5702b93c055c400162302be00e6434fc7e6d637832acf66d344b76f657f5",
+    "shipping/src/lib.rs": "1c9d292da5f0a2dc8c2bbbc2b30976f984679b80dc73399bf6275a5c827f18ad",
+    "shipping/src/reed.rs": "dcc0b98e4e0dd35053aa76c54e4eab5eb49608a019edadca3a1f5816ec19e52e",
+    "shipping/src/dk_preamp_legacy.rs": "7873721a98bf78996f76e3928c1cfc4e6f08f0764fe1329a80082c77a250d4d1",
+    "shipping/src/power_amp.rs": "960990327fb0525904227b0a57e878ed7375080c8dcb5dd77ab0855cf6f5ff23",
+    "shipping/src/voice.rs": "619d2bf5c6a739318a07094b38b98dee47818b2ffa9439341b2a0439e74eece7",
+    "shipping/src/engine.rs": "d7d7022d339c13f690b9d6d00aaaed106854f7a6c86b1f66d543c885f2bdaa4f",
+    "scalar/Cargo.toml": "9621f87c27852b8bbf76c331af9dd816deb20b61b288a29823a6b98f9e00c1a8",
+    "shipping/Cargo.toml": "7e780778fcacf1723d59e94956e724e6f1bbe99f90342943cf129e7ef670f9ad"
+  }
+}

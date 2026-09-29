@@ -1,0 +1,10 @@
+[package]
+name = "openwurli-reed-proof"
+version = "0.0.0"
+edition = "2024"
+[dependencies]
+openwurli-dsp = { path = "../../crates/openwurli-dsp" }
+wide = "0.7"
+
+# TEMPORARY: delete this standalone proof crate after the CPU/audio study.
+[workspace]

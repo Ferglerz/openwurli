@@ -1,0 +1,114 @@
+{
+  "samples_per_comparison": 35168256,
+  "scenarios": 1536,
+  "mismatched_samples": 0,
+  "timing": {
+    "scalar": {
+      "median_ms": 63.933708,
+      "min_ms": 63.814167,
+      "max_ms": 64.209083,
+      "raw_ms": [
+        63.874458,
+        63.987833,
+        63.933666,
+        64.209083,
+        63.814167,
+        63.904209,
+        64.028625,
+        64.188917,
+        63.866917,
+        63.93375
+      ]
+    },
+    "simd": {
+      "median_ms": 41.072417,
+      "min_ms": 41.02525,
+      "max_ms": 41.623667,
+      "raw_ms": [
+        41.03975,
+        41.037959,
+        41.036083,
+        41.187167,
+        41.070875,
+        41.423625,
+        41.185708,
+        41.02525,
+        41.073959,
+        41.623667
+      ]
+    },
+    "post": {
+      "median_ms": 32.820188,
+      "min_ms": 32.507541,
+      "max_ms": 33.248209,
+      "raw_ms": [
+        32.84,
+        32.507541,
+        32.800375,
+        32.860709,
+        32.752584,
+        33.248209,
+        33.239541,
+        32.547459,
+        32.574,
+        32.869625
+      ]
+    }
+  },
+  "date": "2026-09-29",
+  "architecture": "aarch64-apple-darwin",
+  "compiler": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "profile": "release; default target CPU; no custom RUSTFLAGS",
+  "scalar_ref": "6614ab9519471e956ecb0c82edc4fcf295f724dc",
+  "simd_ref": "612dbda54cad9a8a666aa5dc6496d73f5d5da27d",
+  "post_reed_source_sha256_at_measurement": "0f9af0fa541cc8cf2dd2c9026b720eef180dfe85be07e4c01470c62c5ad71860",
+  "scope": "reed only; 32 reeds x 192000 samples at 48000Hz; 256 frame blocks; startup excluded",
+  "method": "12 interleaved rounds rotating variant order; discard first 2 rounds; retain 10 measured rounds",
+  "audio": {
+    "note_range": [
+      33,
+      96
+    ],
+    "sample_rates": [
+      44100,
+      48000,
+      88200,
+      96000
+    ],
+    "velocities": [
+      0,
+      0.001,
+      0.3,
+      0.8,
+      0.999,
+      1
+    ],
+    "block_sizes": [
+      0,
+      1,
+      15,
+      16,
+      17,
+      31,
+      127,
+      257,
+      1023,
+      2049,
+      4096
+    ],
+    "phases": [
+      "attack/sustain",
+      "damping",
+      "repeated note-off"
+    ],
+    "exact_bits": true,
+    "c4_scalar_checksum_arm64": "12062458625402485202",
+    "c4_simd_checksum_arm64": "12062458625402485202",
+    "c4_post_checksum_arm64": "12062458625402485202"
+  },
+  "limitations": [
+    "Reed-only CPU measurements do not predict whole-plugin gain.",
+    "One Apple ARM64 host/toolchain; no cross-platform identity claim.",
+    "Fixed C4 golden from prior x86 platform differs due platform math, while all local variants match."
+  ]
+}
