@@ -1,0 +1,110 @@
+{
+  "baselines": {
+    "upstream": {
+      "revision": "3023a8a6c42c654c5caeec52fd22dcf2cff3cb15",
+      "mutable_modules": [
+        "dk_preamp_legacy",
+        "engine",
+        "power_amp",
+        "reed",
+        "tremolo",
+        "voice"
+      ]
+    },
+    "exact": {
+      "revision": "cab1a759d9839f6002674dd469867eb8b598bec7",
+      "mutable_modules": [
+        "dk_preamp_legacy",
+        "engine",
+        "power_amp",
+        "reed",
+        "tremolo",
+        "voice"
+      ]
+    }
+  },
+  "shared": {
+    "crates/openwurli-dsp/src/alias_audit.rs": {
+      "upstream": "6bf90661249163fd89fe27c8a997bdf08c2eff48",
+      "exact": "6bf90661249163fd89fe27c8a997bdf08c2eff48"
+    },
+    "crates/openwurli-dsp/src/dk_preamp/melange_adapter.rs": {
+      "upstream": "8e0a890872498b33d590cb847ce7b77fecc8edbf",
+      "exact": "8e0a890872498b33d590cb847ce7b77fecc8edbf"
+    },
+    "crates/openwurli-dsp/src/dk_preamp/mod.rs": {
+      "upstream": "c960929a4b32a9e67cbf0c81a45ae7a387662a9a",
+      "exact": "c960929a4b32a9e67cbf0c81a45ae7a387662a9a"
+    },
+    "crates/openwurli-dsp/src/filters.rs": {
+      "upstream": "65bc030c832b24b4df531daf513e8d1c2ed03268",
+      "exact": "65bc030c832b24b4df531daf513e8d1c2ed03268"
+    },
+    "crates/openwurli-dsp/src/gen_power_amp.rs": {
+      "upstream": "90ae3123ab1665546f75bd9f1a6a0c5e51ce35a0",
+      "exact": "90ae3123ab1665546f75bd9f1a6a0c5e51ce35a0"
+    },
+    "crates/openwurli-dsp/src/gen_preamp.rs": {
+      "upstream": "415949f726f9467efb674d84d7b91cad5ff25b91",
+      "exact": "415949f726f9467efb674d84d7b91cad5ff25b91"
+    },
+    "crates/openwurli-dsp/src/gen_tremolo.rs": {
+      "upstream": "93a9740da25ba250dffbe37c4a2489a088168a76",
+      "exact": "93a9740da25ba250dffbe37c4a2489a088168a76"
+    },
+    "crates/openwurli-dsp/src/hammer.rs": {
+      "upstream": "611f08c15ff0cf63dacd7b783c3e3ade8f303a30",
+      "exact": "611f08c15ff0cf63dacd7b783c3e3ade8f303a30"
+    },
+    "crates/openwurli-dsp/src/mlp_correction.rs": {
+      "upstream": "dcb8d58c235b60c9b35edb3edbd845f60dd5b88d",
+      "exact": "dcb8d58c235b60c9b35edb3edbd845f60dd5b88d"
+    },
+    "crates/openwurli-dsp/src/mlp_weights.rs": {
+      "upstream": "508600db6c0bb30c12a6d900315a89ba0cb6955c",
+      "exact": "508600db6c0bb30c12a6d900315a89ba0cb6955c"
+    },
+    "crates/openwurli-dsp/src/oversampler.rs": {
+      "upstream": "04ea63714c7d18e59cce5d766ba1b790721ebc83",
+      "exact": "04ea63714c7d18e59cce5d766ba1b790721ebc83"
+    },
+    "crates/openwurli-dsp/src/pickup.rs": {
+      "upstream": "26545dfc1a9c9d8ea3f4bf0fe0dbc159fb2e4d05",
+      "exact": "26545dfc1a9c9d8ea3f4bf0fe0dbc159fb2e4d05"
+    },
+    "crates/openwurli-dsp/src/preamp.rs": {
+      "upstream": "84d45f6f63d2feb01bcc9456f9bd2cc8c0a8ca8d",
+      "exact": "84d45f6f63d2feb01bcc9456f9bd2cc8c0a8ca8d"
+    },
+    "crates/openwurli-dsp/src/speaker.rs": {
+      "upstream": "e4c48d2471f120abfb984cdcb499ba6b399e936c",
+      "exact": "e4c48d2471f120abfb984cdcb499ba6b399e936c"
+    },
+    "crates/openwurli-dsp/src/tables.rs": {
+      "upstream": "fbb2a3d7a6cc1dee36efa2ea6d982c1c2a493a5d",
+      "exact": "fbb2a3d7a6cc1dee36efa2ea6d982c1c2a493a5d"
+    },
+    "crates/openwurli-dsp/src/variation.rs": {
+      "upstream": "f716fe0148dee0ea9b7b5a9da6d13f53b05bf6c5",
+      "exact": "f716fe0148dee0ea9b7b5a9da6d13f53b05bf6c5"
+    }
+  },
+  "snapshot_sha256": {
+    "upstream/src/tremolo.rs": "57f34e92c3a903ab90687e8a719788e475daf78bdedadf2d96758298caabe828",
+    "upstream/src/lib.rs": "1c9d292da5f0a2dc8c2bbbc2b30976f984679b80dc73399bf6275a5c827f18ad",
+    "upstream/src/reed.rs": "3443f693847c73667dca83b3fd8003e33b51a17d3957c64470cab0017c68ba01",
+    "upstream/src/dk_preamp_legacy.rs": "7873721a98bf78996f76e3928c1cfc4e6f08f0764fe1329a80082c77a250d4d1",
+    "upstream/src/power_amp.rs": "960990327fb0525904227b0a57e878ed7375080c8dcb5dd77ab0855cf6f5ff23",
+    "upstream/src/voice.rs": "1276258a32c67a16651aaaec1805a6c57dd90c1eeff2303df1ae4a446a3d6c77",
+    "upstream/src/engine.rs": "f469d4fe854fae21d21ca96ad6f8a91ac8e0a5ed479e4b3ea83dbb8d135fd6e6",
+    "upstream/Cargo.toml": "6a0b8bd7a5c81d47ac1dd9f8d74cf7a8da460dcb542868f1cdb4651c1627c18e",
+    "exact/src/tremolo.rs": "49425456cfe5776dc53ba32839ab1fae220151a396226831949fa284fe8d5ef5",
+    "exact/src/lib.rs": "1c9d292da5f0a2dc8c2bbbc2b30976f984679b80dc73399bf6275a5c827f18ad",
+    "exact/src/reed.rs": "67c2e8cdb48c3120b744e2c2832de422871c686e926b363207405c5e19866641",
+    "exact/src/dk_preamp_legacy.rs": "6ce0cb433db1a6434010d4f3fc0cf2216dbec9e46f6ec392d2ae580f46df82be",
+    "exact/src/power_amp.rs": "960990327fb0525904227b0a57e878ed7375080c8dcb5dd77ab0855cf6f5ff23",
+    "exact/src/voice.rs": "1276258a32c67a16651aaaec1805a6c57dd90c1eeff2303df1ae4a446a3d6c77",
+    "exact/src/engine.rs": "5564521f31f64f6fa13e451ed849478caf8507333e8a0762b4238d9f50e1bc7a",
+    "exact/Cargo.toml": "b67bb3027a4b515b18d0fbe87195da3717f444c2302a5e278827bffb07190daf"
+  }
+}
