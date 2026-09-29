@@ -139,16 +139,6 @@ pub fn ldr_resistance_analytical(drive: f64, ln_max: f64, ln_range: f64, gamma: 
     log_r.exp()
 }
 
-/// Canonical nominal CdS curve and its derivative for Hermite table generation.
-/// Component values come from this module's physical constants, once only.
-#[cfg(feature = "experimental-circuit-lut")]
-pub(crate) fn ldr_law_sample(drive: f64) -> (f64, f64) {
-    let ln_max = R_LDR_MAX.ln();
-    let ln_range = R_LDR_MIN.ln() - ln_max;
-    let value = ldr_resistance_analytical(drive, ln_max, ln_range, GAMMA);
-    (value, value * ln_range * GAMMA * drive.powf(GAMMA - 1.0))
-}
-
 pub struct Tremolo {
     // --- Oscillator state ---
     /// Behavioral: LFO phase
@@ -219,8 +209,6 @@ const LEGACY_RATE_HZ: f64 = 5.63;
 
 impl Tremolo {
     pub fn new(depth: f64, sample_rate: f64) -> Self {
-        #[cfg(feature = "experimental-circuit-lut")]
-        crate::circuit_lut::initialize();
         Self {
             #[cfg(feature = "legacy-tremolo")]
             phase: 0.0,
@@ -287,17 +275,10 @@ impl Tremolo {
         if drive < 1e-6 {
             self.r_ldr = self.r_ldr_max;
         } else {
-            let native = || {
-                ldr_resistance_analytical(drive, self.ln_r_max, self.ln_min_minus_max, self.gamma)
-            };
-            #[cfg(feature = "experimental-circuit-lut")]
-            {
-                self.r_ldr = crate::circuit_lut::ldr_resistance(drive).unwrap_or_else(native);
-            }
-            #[cfg(not(feature = "experimental-circuit-lut"))]
-            {
-                self.r_ldr = native();
-            }
+            // The analytical curve remains native: even tiny LDR differences
+            // perturbed the large-signal legacy preamp trajectory in A/B tests.
+            self.r_ldr =
+                ldr_resistance_analytical(drive, self.ln_r_max, self.ln_min_minus_max, self.gamma);
         }
 
         // Step 4: depth divider → shunt impedance seen by fb_junction

@@ -385,8 +385,6 @@ impl DkPreamp {
     pub fn set_thermal_gain(&mut self, _gain: f64) {}
 
     pub fn new(sample_rate: f64) -> Self {
-        #[cfg(feature = "experimental-circuit-lut")]
-        crate::circuit_lut::initialize();
         let t = 1.0 / sample_rate;
         let two_over_t = 2.0 / t;
 
@@ -856,14 +854,9 @@ fn stamp_capacitor_to_gnd(c: &mut MatN, i: usize, cap: f64) {
 /// arbiter tolerance without it (worst node 2.70 mV).
 #[inline]
 fn bjt(vbe: f64) -> (f64, f64, f64, f64) {
-    #[cfg(feature = "experimental-circuit-lut")]
-    {
-        bjt_with_exp(vbe, crate::circuit_lut::exp)
-    }
-    #[cfg(not(feature = "experimental-circuit-lut"))]
-    {
-        bjt_analytical(vbe)
-    }
+    // Perturbing this solver's transistor curve failed the full-engine audio
+    // gate under high-drive controls. Keep native evaluation in every build.
+    bjt_analytical(vbe)
 }
 
 /// Original analytical BJT kernel, retained for comparisons in every build.

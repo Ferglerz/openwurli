@@ -33,11 +33,10 @@ for each mathematical function. Generic specialization avoids a function pointer
 call for each sample and avoids maintaining a second copy of the circuit.
 
 `tremolo::ldr_resistance_analytical` retains the original log-resistance formula
-and accepts the instance's precomputed logarithms and gamma. The LDR table
-builder calls `tremolo::ldr_law_sample`, which uses that same formula and the
-module's physical constants. No independent copy of the component values or
-fitted curve is embedded in the table module. Runtime native evaluation and
-out-of-domain fallback call the retained analytical function.
+and accepts the instance's precomputed logarithms and gamma. This curve and the
+BJT exponential remain native in every build. The initial exp/LDR generators
+are preserved in commit `81c0916` for future investigation; their engine-level
+errors under strong drive ruled out enabling them.
 
 Retain these native analytical paths permanently. They are the reference for
 future table changes, sample-rate coverage and numerical investigations.
@@ -46,31 +45,33 @@ analytical source cannot.
 
 ## Optional tables
 
-The candidate uses 2048-segment cubic Hermite interpolation, with native
-fallback outside the following half-open intervals:
+The retained candidate uses a 2048-segment cubic Hermite table for the
+amplifier's hyperbolic tangent only, with native fallback outside `[-12,12)`.
+Four polynomial coefficients per segment consume 64 KiB. Construction uses the
+retained native `circuit_math::tanh` function once, before sample processing.
+The table is immutable/shared; the amplifier caches its reference at construction,
+and runtime lookup performs no allocation or OnceLock access.
+Exponential, BJT and CdS resistance evaluation stay native in all builds.
 
-- Exponential: `[-40, 40)`.
-- Hyperbolic tangent: `[-12, 12)`.
-- Nominal CdS resistance: `[1/64, 1)` in envelope-drive units.
-
-Keeping the LDR dark tail native avoids its singular power-law slope at zero
-and preserves the original threshold branch. Four polynomial coefficients per
-segment consume 192 KiB across all three tables. They are immutable and shared;
-construction initializes them once, before sample processing. Runtime lookup
-performs no allocation.
-
-Newton derivatives are derivatives of the actual interpolated polynomial:
+Newton derivatives differentiate the actual interpolation polynomial:
 `p(t)=a+t*(b+t*(c+t*d))`, `p'(x)=(b+t*(2*c+t*3*d))/step`.
-The BJT's charge and recombination chain rules, and the amplifier's crossover
-and rail chain rules, use those returned derivatives. Using `1-tanh_table(x)^2`
-would differentiate a different function; the implementation does not do that.
+The amplifier's crossover and rail chain rules use these derivatives. Using
+`1-tanh_table(x)^2` would differentiate a different function.
 
-A targeted off-grid sweep of 100,000 positions observed maximum exponential
-relative value error `6.06e-9`, exponential relative derivative error `4.83e-7`,
-tanh absolute value error `2.01e-10`, tanh absolute derivative error `5.27e-8`,
-and LDR relative error `6.40e-11`. These sampled bounds are not an exhaustive
-proof or an audibility claim. Feedback and solver stopping thresholds must be
-assessed using complete pre/post output and timing comparisons.
+The initial three-table candidate (commit `81c0916`) had tiny local errors in
+100,000 off-grid samples: exponential relative value error `6.06e-9`, relative
+derivative error `4.83e-7`; tanh absolute value error `2.01e-10`, absolute
+derivative error `5.27e-8`; LDR relative error `6.40e-11`. Nevertheless the
+controls fork's engine output differed by more than +14 dBFS in its worst case.
+Isolating the BJT and LDR candidates each reproduced large-signal preamp
+sensitivity. No physical equations, iteration caps or convergence behavior
+were changed to conceal this failure. Only the tanh candidate remains opt-in;
+all tables are disabled in the shipping UI.
+
+These are numerical engineering results, not listening-test claims. Finite
+output and small function error cannot establish solver convergence or
+inaudibility. The [full controls-fork report](https://github.com/Ferglerz/openwurli/blob/codex/pleasant-controls/docs/cpu/RESULTS.md)
+records the shipping native path and the candidate's disposition.
 
 ## Acceptance and exclusions
 
@@ -90,7 +91,7 @@ exact patch (`cab1a75`) from Git into ignored, disposable directories. Original
 engine sources remain in Git and original analytical functions remain in the
 production crate. Do not delete those functions when retiring generated baselines.
 
-The archived `docs/cpu/records/upstream-native-quick-*` run compared 70 cases:
+The archived (pre-narrowing) `docs/cpu/records/upstream-native-quick-*` run compared 70 cases:
 all rendered samples were bit-identical. `upstream-lut-quick-*` tested the first
 three-table candidate against the same cases: worst peak residual -138.47 dBFS,
 worst residual RMS -131.71 dB relative to reference. This is a narrow audio
@@ -104,3 +105,9 @@ This branch is based on the original instrument's v0.7 revision. Upstream v0.9
 changes reed physics, pickup and amplifier behavior; porting this work to current
 upstream is a separate sound-model migration. A future PR against current main
 requires that port and renewed measurements.
+
+The final tanh-only candidate passed the controls fork's 70-case quick audio
+screen (worst peak residual -144.49 dBFS, worst relative RMS residual -178.81 dB)
+but did not show a repeatable CPU improvement in eleven repeats across seven
+workloads. It remains an explicitly optional comparison candidate, disabled by
+default. No full LUT release qualification or listening/spectral result is claimed.
