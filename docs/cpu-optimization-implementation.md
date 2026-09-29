@@ -82,3 +82,25 @@ Damper recurrence replacement and non-power-of-two reciprocal rewrites are not
 part of the exact patch: they change rounding. Cross-voice packing and wavetable
 instruments are separate designs. Generated circuit output, precision, solver
 iteration limits, physical constants and parameter APIs are unchanged.
+
+## Reproducible upstream comparison
+
+`tools/cpu-ab` reconstructs the actual upstream v0.7 baseline (`3023a8a`) and
+exact patch (`cab1a75`) from Git into ignored, disposable directories. Original
+engine sources remain in Git and original analytical functions remain in the
+production crate. Do not delete those functions when retiring generated baselines.
+
+The archived `docs/cpu/records/upstream-native-quick-*` run compared 70 cases:
+all rendered samples were bit-identical. `upstream-lut-quick-*` tested the first
+three-table candidate against the same cases: worst peak residual -138.47 dBFS,
+worst residual RMS -131.71 dB relative to reference. This is a narrow audio
+screen, with no CPU timing or listening conclusion. The controls fork exposes
+larger input ranges and **failed** the three-table candidate's full-engine
+screen despite these upstream-only results. Consequently tables are disabled
+by default. Passing isolated function error or a narrower parameter matrix is
+insufficient to ship them.
+
+This branch is based on the original instrument's v0.7 revision. Upstream v0.9
+changes reed physics, pickup and amplifier behavior; porting this work to current
+upstream is a separate sound-model migration. A future PR against current main
+requires that port and renewed measurements.
