@@ -15,7 +15,13 @@
 
 use std::f64::consts::{PI, TAU};
 
+use wide::f64x2;
+
 use crate::tables::NUM_MODES;
+
+/// Modes processed as `f64x2` pairs. Mode 6 stays scalar so the LCG
+/// jitter stream keeps its original 0..6 order.
+const SIMD_PAIRS: usize = NUM_MODES / 2;
 
 /// RMS frequency jitter as fraction of mode frequency (~0.04% = 4 cents peak).
 const JITTER_SIGMA: f64 = 0.0004;
@@ -38,36 +44,24 @@ const JITTER_SUBSAMPLE: u64 = 16;
 /// Cost: 7 sqrt + 7 div per 1024 samples = 0.014 transcendentals/sample.
 const RENORM_INTERVAL: u64 = 1024;
 
-/// Per-mode oscillator state — array-of-structs for sequential access.
-///
-/// 88 bytes/mode × 7 = 616 bytes. Fits in L1 cache.
-struct Mode {
-    /// Quadrature sine state (output signal).
-    s: f64,
-    /// Quadrature cosine state.
-    c: f64,
-    /// cos(base_phase_inc) — precomputed at note-on.
-    cos_inc: f64,
-    /// sin(base_phase_inc) — precomputed at note-on.
-    sin_inc: f64,
-    /// Base phase increment (for jitter delta scaling).
-    phase_inc: f64,
-    /// Initial amplitude for this mode.
-    amplitude: f64,
-    /// Per-sample multiplicative natural decay factor.
-    decay_mult: f64,
-    /// Current envelope level (starts at 1.0, decays each sample).
-    envelope: f64,
-    /// OU jitter drift state (fractional frequency deviation).
-    jitter_drift: f64,
-    /// Damper rate in nepers/sample (set on note_off).
-    damper_rate: f64,
-    /// Precomputed exp(-damper_rate) for post-ramp phase.
-    damper_mult: f64,
-}
-
+/// Per-mode oscillator state as struct-of-arrays so two modes load into one
+/// `f64x2` register. Same `f64` ops as the old array-of-structs loop.
 pub struct ModalReed {
-    modes: [Mode; NUM_MODES],
+    s: [f64; NUM_MODES],
+    c: [f64; NUM_MODES],
+    cos_inc: [f64; NUM_MODES],
+    sin_inc: [f64; NUM_MODES],
+    phase_inc: [f64; NUM_MODES],
+    // Jitter is held for 16 samples. Cache its corrected rotation until the
+    // next OU update; evaluating the same f64 expression again adds no detail.
+    rotation_cos: [f64; NUM_MODES],
+    rotation_sin: [f64; NUM_MODES],
+    amplitude: [f64; NUM_MODES],
+    decay_mult: [f64; NUM_MODES],
+    envelope: [f64; NUM_MODES],
+    jitter_drift: [f64; NUM_MODES],
+    damper_rate: [f64; NUM_MODES],
+    damper_mult: [f64; NUM_MODES],
     sample: u64,
     // Onset ramp
     onset_ramp_samples: u64,
@@ -82,6 +76,40 @@ pub struct ModalReed {
     jitter_state: u32,
     jitter_revert: f64,
     jitter_diffusion: f64,
+}
+
+#[inline]
+fn load2(arr: &[f64; NUM_MODES], i: usize) -> f64x2 {
+    f64x2::new([arr[i], arr[i + 1]])
+}
+
+#[inline]
+fn store2(arr: &mut [f64; NUM_MODES], i: usize, v: f64x2) {
+    let [a, b] = v.to_array();
+    arr[i] = a;
+    arr[i + 1] = b;
+}
+
+/// Scalar leftover lane (mode 6). Same add-then-rotate-then-decay order
+/// as the original per-mode loop.
+#[inline]
+fn advance_scalar_mode(
+    s: &mut f64,
+    c: &mut f64,
+    ci: f64,
+    si: f64,
+    amplitude: f64,
+    decay_mult: f64,
+    envelope: &mut f64,
+    onset: f64,
+) -> f64 {
+    let contrib = amplitude * *s * onset * *envelope;
+    let s_new = *s * ci + *c * si;
+    let c_new = *c * ci - *s * si;
+    *s = s_new;
+    *c = c_new;
+    *envelope *= decay_mult;
+    contrib
 }
 
 /// LCG PRNG → scaled uniform noise with unit variance.
@@ -133,27 +161,23 @@ impl ModalReed {
             *d = JITTER_SIGMA * r * (TAU * u2).cos();
         }
 
-        // Build Mode structs with precomputed quadrature rotation coefficients
-        let modes = std::array::from_fn(|i| {
+        let mut s = [0.0f64; NUM_MODES];
+        let mut c = [1.0f64; NUM_MODES];
+        let mut cos_inc = [0.0f64; NUM_MODES];
+        let mut sin_inc = [0.0f64; NUM_MODES];
+        let mut phase_inc = [0.0f64; NUM_MODES];
+        let mut decay_mult = [0.0f64; NUM_MODES];
+        for i in 0..NUM_MODES {
             let freq = fundamental_hz * mode_ratios[i];
-            let phase_inc = TAU * freq / sample_rate;
+            let inc = TAU * freq / sample_rate;
             let alpha_nepers = decay_rates_db[i] / 8.686;
-            let decay_per_sample = alpha_nepers / sample_rate;
-
-            Mode {
-                s: 0.0,                   // sin(0) = 0
-                c: 1.0,                   // cos(0) = 1
-                cos_inc: phase_inc.cos(), // precomputed rotation
-                sin_inc: phase_inc.sin(), // precomputed rotation
-                phase_inc,
-                amplitude: amplitudes[i],
-                decay_mult: (-decay_per_sample).exp(),
-                envelope: 1.0,
-                jitter_drift: initial_drifts[i],
-                damper_rate: 0.0,
-                damper_mult: 1.0,
-            }
-        });
+            s[i] = 0.0;
+            c[i] = 1.0;
+            cos_inc[i] = inc.cos();
+            sin_inc[i] = inc.sin();
+            phase_inc[i] = inc;
+            decay_mult[i] = (-(alpha_nepers / sample_rate)).exp();
+        }
 
         // Onset ramp
         let ramp_samps = (onset_time_s * sample_rate).round() as u64;
@@ -166,7 +190,20 @@ impl ModalReed {
         let onset_shape_exp = 1.0 + (1.0 - velocity);
 
         Self {
-            modes,
+            s,
+            c,
+            cos_inc,
+            sin_inc,
+            phase_inc,
+            // Sample zero updates jitter and fills both caches before use.
+            rotation_cos: cos_inc,
+            rotation_sin: sin_inc,
+            amplitude: *amplitudes,
+            decay_mult,
+            envelope: [1.0; NUM_MODES],
+            jitter_drift: initial_drifts,
+            damper_rate: [0.0; NUM_MODES],
+            damper_mult: [1.0; NUM_MODES],
             sample: 0,
             onset_ramp_samples: ramp_samps,
             onset_ramp_inc: ramp_inc,
@@ -195,10 +232,10 @@ impl ModalReed {
         }
 
         let base_rate = (55.0 * 2.0_f64.powf((midi_note as f64 - 60.0) / 24.0)).max(0.5);
-        for (m, mode) in self.modes.iter_mut().enumerate() {
+        for m in 0..NUM_MODES {
             let factor = (base_rate * 3.0_f64.powi(m as i32)).min(2000.0);
-            mode.damper_rate = factor / sample_rate;
-            mode.damper_mult = (-mode.damper_rate).exp();
+            self.damper_rate[m] = factor / sample_rate;
+            self.damper_mult[m] = (-self.damper_rate[m]).exp();
         }
 
         let ramp_time = if midi_note < 48 {
@@ -233,15 +270,15 @@ impl ModalReed {
                         self.damper_ramp_done = true;
                     } else {
                         // During ramp: apply instantaneous rate (still needs exp per mode)
-                        for mode in &mut self.modes {
-                            let inst_rate = mode.damper_rate * t / ramp;
-                            mode.envelope *= (-inst_rate).exp();
+                        for i in 0..NUM_MODES {
+                            let inst_rate = self.damper_rate[i] * t / ramp;
+                            self.envelope[i] *= (-inst_rate).exp();
                         }
                     }
                 }
                 if self.damper_ramp_done {
-                    for mode in &mut self.modes {
-                        mode.envelope *= mode.damper_mult;
+                    for i in 0..NUM_MODES {
+                        self.envelope[i] *= self.damper_mult[i];
                     }
                 }
             }
@@ -265,38 +302,56 @@ impl ModalReed {
 
             // Subsample jitter update: every 16 samples
             if self.sample & (JITTER_SUBSAMPLE - 1) == 0 {
-                for mode in &mut self.modes {
+                for i in 0..NUM_MODES {
                     let noise = lcg_uniform_scaled(&mut self.jitter_state);
-                    mode.jitter_drift = revert * mode.jitter_drift + diffusion * noise;
+                    self.jitter_drift[i] = revert * self.jitter_drift[i] + diffusion * noise;
+                    // Preserve the original Taylor correction and operation order.
+                    // Only its evaluation frequency changes: drift and phase_inc
+                    // stay constant until the next jitter update.
+                    let delta_phase = self.jitter_drift[i] * self.phase_inc[i];
+                    self.rotation_cos[i] = self.cos_inc[i] - delta_phase * self.sin_inc[i];
+                    self.rotation_sin[i] = self.sin_inc[i] + delta_phase * self.cos_inc[i];
                 }
             }
 
-            // Quadrature oscillator: 0 transcendentals per mode per sample
-            for mode in &mut self.modes {
-                sum += mode.amplitude * mode.s * onset * mode.envelope;
+            // Quadrature oscillator: 0 transcendentals per mode per sample.
+            // Two modes per `f64x2`; leftover mode 6 stays scalar.
+            let onset_v = f64x2::new([onset, onset]);
+            for pair in 0..SIMD_PAIRS {
+                let i = pair * 2;
+                let s = load2(&self.s, i);
+                let c = load2(&self.c, i);
+                let contrib = load2(&self.amplitude, i) * s * onset_v * load2(&self.envelope, i);
+                let [c0, c1] = contrib.to_array();
+                sum += c0;
+                sum += c1;
 
-                // Jitter-corrected rotation via first-order Taylor approximation.
-                // delta_phase = jitter_drift * phase_inc ~ 0.0004 * 0.063 = 2.5e-5 rad.
-                // Taylor error ~ delta²/2 = 3e-10/sample. Over 1024 samples: ~3e-7 cumulative.
-                let delta_phase = mode.jitter_drift * mode.phase_inc;
-                let ci = mode.cos_inc - delta_phase * mode.sin_inc;
-                let si = mode.sin_inc + delta_phase * mode.cos_inc;
-                let s_new = mode.s * ci + mode.c * si;
-                let c_new = mode.c * ci - mode.s * si;
-                mode.s = s_new;
-                mode.c = c_new;
-
-                // Natural decay
-                mode.envelope *= mode.decay_mult;
+                let ci = load2(&self.rotation_cos, i);
+                let si = load2(&self.rotation_sin, i);
+                let env_next = load2(&self.envelope, i) * load2(&self.decay_mult, i);
+                store2(&mut self.s, i, s * ci + c * si);
+                store2(&mut self.c, i, c * ci - s * si);
+                store2(&mut self.envelope, i, env_next);
             }
+            sum += advance_scalar_mode(
+                &mut self.s[6],
+                &mut self.c[6],
+                self.rotation_cos[6],
+                self.rotation_sin[6],
+                self.amplitude[6],
+                self.decay_mult[6],
+                &mut self.envelope[6],
+                onset,
+            );
 
-            // Renormalize quadrature radius every 1024 samples
+            // Renormalize quadrature radius every 1024 samples.
+            // Keep this scalar: wide::recip can be a hardware estimate.
             if self.sample & (RENORM_INTERVAL - 1) == 0 && self.sample > 0 {
-                for mode in &mut self.modes {
-                    let r_sq = mode.s * mode.s + mode.c * mode.c;
+                for i in 0..NUM_MODES {
+                    let r_sq = self.s[i] * self.s[i] + self.c[i] * self.c[i];
                     let r_inv = 1.0 / r_sq.sqrt();
-                    mode.s *= r_inv;
-                    mode.c *= r_inv;
+                    self.s[i] *= r_inv;
+                    self.c[i] *= r_inv;
                 }
             }
 
@@ -308,9 +363,10 @@ impl ModalReed {
     /// Check if the reed has decayed below a threshold (all modes).
     pub fn is_silent(&self, threshold_db: f64) -> bool {
         let threshold_linear = 10.0_f64.powf(threshold_db / 20.0);
-        self.modes
+        self.amplitude
             .iter()
-            .all(|mode| (mode.amplitude * mode.envelope).abs() <= threshold_linear)
+            .zip(self.envelope.iter())
+            .all(|(amp, env)| (amp * env).abs() <= threshold_linear)
     }
 
     /// Check if damper is active.
@@ -523,6 +579,41 @@ mod tests {
         reed_b.render(&mut buf_b);
 
         assert_eq!(buf_a, buf_b, "Same seed should produce identical output");
+    }
+
+    fn render_checksum_c4(block_size: usize) -> u64 {
+        let mut amps = [0.0f64; NUM_MODES];
+        amps[0] = 1.0;
+        amps[1] = 0.3;
+        amps[2] = 0.1;
+        let ratios = [1.0, 6.267, 17.547, 34.386, 56.842, 85.1, 119.3];
+        let decays = [4.5, 18.0, 40.0, 80.0, 120.0, 180.0, 240.0];
+        let mut reed = ModalReed::new(261.63, &ratios, &amps, &decays, 0.002, 0.8, 44_100.0, 42);
+        let mut buf = vec![0.0f64; 8192];
+        for block in buf.chunks_mut(block_size) {
+            reed.render(block);
+        }
+        reed.start_damper(60, 44_100.0);
+        for block in buf.chunks_mut(block_size) {
+            reed.render(block);
+        }
+        buf.iter()
+            .map(|x| x.to_bits())
+            .fold(0u64, |acc, bits| acc.wrapping_mul(16_777_619) ^ bits)
+    }
+
+    #[test]
+    fn test_render_c4_is_block_size_independent() {
+        // Native libm results differ across architectures. Compare the same
+        // calculation locally instead of imposing one machine's golden bits.
+        // The external pre/post harness separately checks historical scalar output.
+        let checksum = render_checksum_c4(8192);
+        for block_size in [1, 15, 257, 1024] {
+            assert_eq!(
+                render_checksum_c4(block_size), checksum,
+                "reed output changed with host block size {block_size}"
+            );
+        }
     }
 
     #[test]

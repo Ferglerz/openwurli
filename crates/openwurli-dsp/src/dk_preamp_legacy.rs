@@ -344,6 +344,16 @@ struct DkState {
     i_c: [f64; 2],  // Absolute collector currents
     i_b: [f64; 2],  // Absolute base currents
     v_nl: [f64; 2], // Full Vbe (for NR warm start)
+    // Exact cache, invalidated on reset and any accepted LDR conductance change.
+    sm_kernel: Option<SmKernel>,
+}
+
+#[derive(Clone, Copy)]
+struct SmKernel {
+    conductance: f64,
+    scale: f64,
+    collector: [[f64; 2]; 2],
+    base: [[f64; 2]; 2],
 }
 
 impl DkState {
@@ -358,6 +368,7 @@ impl DkState {
             i_c: [d0.0, d1.0],
             i_b: [d0.1, d1.1],
             v_nl: v_nl_dc,
+            sm_kernel: None,
         }
     }
 }
@@ -641,7 +652,32 @@ fn dk_step(
     let v_pred_base = mat_vec_mul(s_base, &rhs);
 
     // 3. SM correction for current R_ldr
-    let sm_k = g_ldr / (1.0 + s_fb_fb * g_ldr);
+    // Reusing these values is exact: the fixed projection matrices never
+    // change, and set_ldr_resistance already controls accepted conductance.
+    // In particular depth=0 previously recomputed all of this every sample.
+    let kernel = match state.sm_kernel {
+        Some(cached) if cached.conductance == g_ldr => cached,
+        _ => {
+            let scale = g_ldr / (1.0 + s_fb_fb * g_ldr);
+            let mut collector = [[0.0; 2]; 2];
+            let mut base = [[0.0; 2]; 2];
+            for i in 0..2 {
+                for j in 0..2 {
+                    collector[i][j] = k_c[i][j] - scale * nv_sfb[i] * sfb_nic[j];
+                    base[i][j] = k_b[i][j] - scale * nv_sfb[i] * sfb_nib[j];
+                }
+            }
+            let cached = SmKernel {
+                conductance: g_ldr,
+                scale,
+                collector,
+                base,
+            };
+            state.sm_kernel = Some(cached);
+            cached
+        }
+    };
+    let sm_k = kernel.scale;
     let sm_vpred = sm_k * v_pred_base[FB];
     let mut v_pred = vec_zero();
     for i in 0..N {
@@ -652,14 +688,8 @@ fn dk_step(
     let p = [v_pred[BASE1] - v_pred[EMIT1], v_pred[COLL1] - v_pred[EMIT2]];
 
     // 5. NR solve on 2x2 system with R_ldr-corrected kernels
-    let mut kc = [[0.0f64; 2]; 2];
-    let mut kb = [[0.0f64; 2]; 2];
-    for i in 0..2 {
-        for j in 0..2 {
-            kc[i][j] = k_c[i][j] - sm_k * nv_sfb[i] * sfb_nic[j];
-            kb[i][j] = k_b[i][j] - sm_k * nv_sfb[i] * sfb_nib[j];
-        }
-    }
+    let kc = kernel.collector;
+    let kb = kernel.base;
 
     let mut v_nl = state.v_nl;
 

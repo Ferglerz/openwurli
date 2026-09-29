@@ -117,6 +117,19 @@ const LED_I_FULL_MA: f64 = 2.279;
 /// tabulated once at construction and linearly interpolated per sample.
 const LED_LUT_N: usize = 256;
 
+/// Exact depth-only part of the shunt calculation. Called on construction and
+/// parameter changes; the time-varying LDR branch still runs every sample.
+fn depth_divider(depth: f64) -> (f64, f64) {
+    let r_upper = R_VIB_POT * (1.0 - depth);
+    let r_lower = R_VIB_POT * depth;
+    let top = if r_upper > 0.0 {
+        r_upper * R_VIB_BRIDGE / (r_upper + R_VIB_BRIDGE)
+    } else {
+        0.0
+    };
+    (top, r_lower)
+}
+
 pub struct Tremolo {
     // --- Oscillator state ---
     /// Behavioral: LFO phase
@@ -136,6 +149,9 @@ pub struct Tremolo {
     /// oscillator needs ~2 s to build up).
     sample_rate: f64,
     depth: f64,
+    // Depth-only divider terms: preserve the original arithmetic, evaluate only on change.
+    divider_top: f64,
+    divider_lower: f64,
     r_ldr: f64,
     ldr_envelope: f64,
     ldr_attack: f64,
@@ -205,6 +221,8 @@ impl Tremolo {
 
             sample_rate,
             depth,
+            divider_top: depth_divider(depth).0,
+            divider_lower: depth_divider(depth).1,
             r_ldr: R_LDR_MAX,
             ldr_envelope: 0.0,
             ldr_attack: (-1.0 / (ATTACK_TAU * sample_rate)).exp(),
@@ -222,7 +240,11 @@ impl Tremolo {
     }
 
     pub fn set_depth(&mut self, depth: f64) {
-        self.depth = depth.clamp(0.0, 1.0);
+        let depth = depth.clamp(0.0, 1.0);
+        if depth != self.depth {
+            self.depth = depth;
+            (self.divider_top, self.divider_lower) = depth_divider(depth);
+        }
     }
 
     pub fn process(&mut self) -> f64 {
@@ -257,20 +279,14 @@ impl Tremolo {
     /// 50 kΩ pot split by `depth` (wiper). See the constants block for the
     /// topology. At depth = 0 the LDR branch is grounded (vibrato off).
     fn shunt_impedance(&self) -> f64 {
-        let r_upper = R_VIB_POT * (1.0 - self.depth);
-        let r_lower = R_VIB_POT * self.depth;
-        let top = if r_upper > 0.0 {
-            r_upper * R_VIB_BRIDGE / (r_upper + R_VIB_BRIDGE)
-        } else {
-            0.0
-        };
+        let r_lower = self.divider_lower;
         let branch = self.r_ldr;
         let low = if r_lower > 0.0 {
             r_lower * branch / (r_lower + branch)
         } else {
             0.0
         };
-        top + low
+        self.divider_top + low
     }
 
     /// Get the oscillator's LED drive signal (0..1).
