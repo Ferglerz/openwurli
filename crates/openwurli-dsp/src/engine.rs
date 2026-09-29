@@ -267,6 +267,8 @@ struct RuntimeCircuits {
     ldr: Vec<f64>,
     mode: CircuitMode,
     mix: LinearSmoother,
+    preroll_samples: u32,
+    preroll_remaining: u32,
 }
 
 #[cfg(feature = "runtime-models")]
@@ -286,6 +288,8 @@ impl RuntimeCircuits {
             ldr: vec![0.0; MAX_BLOCK_SIZE * 2],
             mode,
             mix: LinearSmoother::new(mode.weight(), (sample_rate * 0.020).round().max(1.0) as u32),
+            preroll_samples: (sample_rate * 0.100).round().max(1.0) as u32,
+            preroll_remaining: 0,
         }
     }
 
@@ -300,11 +304,12 @@ impl RuntimeCircuits {
     fn reset(&mut self) {
         self.fast.reset();
         self.heavy.reset();
+        self.preroll_remaining = 0;
         self.mix.snap_to(self.mode.weight());
     }
 
     fn running(&self, warming: bool) -> (bool, bool) {
-        if warming || self.mix.samples_remaining > 0 {
+        if warming || self.preroll_remaining > 0 || self.mix.samples_remaining > 0 {
             (true, true)
         } else {
             (
@@ -460,13 +465,25 @@ impl WurliEngine {
         engine
     }
 
-    /// Change only the crossfade target. This performs no allocation, solver
-    /// reset, warmup or note-on. A reversal starts at the current blend.
+    /// Resume a stopped circuit with 100 ms of streamed live-input settling,
+    /// then crossfade for 20 ms. The old mode remains audible while settling.
+    /// No allocation, blocking warmup, solver reset or note-on occurs here.
+    /// Cancelling settling keeps the old mode; an active fade reverses from its
+    /// current blend without settling either already-running circuit again.
     #[cfg(feature = "runtime-models")]
     pub fn set_circuit_mode(&mut self, mode: CircuitMode) {
         if self.circuits.mode != mode {
             self.circuits.mode = mode;
-            self.circuits.mix.set_target(mode.weight());
+            if self.circuits.preroll_remaining > 0 {
+                // With two modes this returns to the still-audible endpoint.
+                self.circuits.preroll_remaining = 0;
+                self.circuits.mix.snap_to(mode.weight());
+            } else if self.circuits.mix.samples_remaining > 0 {
+                self.circuits.mix.set_target(mode.weight());
+            } else {
+                // Keep the existing endpoint and feed both histories in render.
+                self.circuits.preroll_remaining = self.circuits.preroll_samples;
+            }
         }
     }
 
@@ -777,21 +794,25 @@ impl WurliEngine {
         self.cleanup_voices();
     }
 
-    /// Render through one circuit pair, or both during a 20 ms model change.
+    /// Render one circuit pair, or both during 100 ms of live-input settling
+    /// followed by a 20 ms crossfade. No extra voice bank or blocking warmup.
     /// Buffers are allocated at construction/ensure_buffer_capacity, never here.
     #[cfg(feature = "runtime-models")]
     pub fn render(&mut self, out: &mut [f32]) {
         let mut position = 0;
         while position < out.len() {
-            // Split at fade completion so the hidden chain stops immediately.
-            let fade_limit = if self.circuits.mix.samples_remaining > 0 {
+            // Start the fade exactly after the last settling sample and stop
+            // the outgoing circuit exactly at fade completion, even mid-block.
+            let transition_limit = if self.circuits.preroll_remaining > 0 {
+                self.circuits.preroll_remaining as usize
+            } else if self.circuits.mix.samples_remaining > 0 {
                 self.circuits.mix.samples_remaining as usize
             } else {
                 usize::MAX
             };
             let len = (out.len() - position)
                 .min(self.sum_buf.len())
-                .min(fade_limit);
+                .min(transition_limit);
             let (fast, heavy) = self.circuits.running(self.warming_circuits);
             self.render_voices_to_preamp_out(0, len);
             for (i, sample_slot) in out[position..position + len].iter_mut().enumerate() {
@@ -829,6 +850,12 @@ impl WurliEngine {
                     }
                     0.0
                 };
+            }
+            if self.circuits.preroll_remaining > 0 {
+                self.circuits.preroll_remaining -= len as u32;
+                if self.circuits.preroll_remaining == 0 {
+                    self.circuits.mix.set_target(self.circuits.mode.weight());
+                }
             }
             self.cleanup_voices();
             position += len;
@@ -1148,6 +1175,100 @@ mod tests {
 
     #[cfg(feature = "runtime-models")]
     #[test]
+    fn runtime_model_preroll_keeps_old_audio_and_has_exact_boundaries() {
+        let mut engine = WurliEngine::new_with_circuit_mode(48_000.0, CircuitMode::Fast);
+        let mut reference = WurliEngine::new_with_circuit_mode(48_000.0, CircuitMode::Fast);
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.samples_remaining, 0);
+        assert_eq!(engine.circuits.mix.current, 0.0);
+        engine.note_on(60, 0.8);
+        reference.note_on(60, 0.8);
+        let age = engine.age_counter;
+        let compare_old_audio = |engine: &mut WurliEngine, reference: &mut WurliEngine, len| {
+            let mut actual = vec![0.0; len];
+            let mut expected = vec![0.0; len];
+            engine.render(&mut actual);
+            reference.render(&mut expected);
+            assert_eq!(
+                actual.iter().map(|x| x.to_bits()).collect::<Vec<_>>(),
+                expected.iter().map(|x| x.to_bits()).collect::<Vec<_>>(),
+                "settling must leave outgoing audio unchanged"
+            );
+        };
+        compare_old_audio(&mut engine, &mut reference, 128);
+        let heavy_before = engine.circuits.heavy.drive_n;
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        assert_eq!(engine.circuits.preroll_remaining, 4800);
+        compare_old_audio(&mut engine, &mut reference, 17);
+        assert_eq!(engine.circuits.heavy.drive_n - heavy_before, 34);
+        assert_eq!(engine.circuits.preroll_remaining, 4783);
+        assert_eq!(engine.circuits.mix.current, 0.0);
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        assert_eq!(
+            engine.circuits.preroll_remaining, 4783,
+            "same target must not restart settling"
+        );
+        engine.set_circuit_mode(CircuitMode::Fast);
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.samples_remaining, 0);
+        let heavy_before = engine.circuits.heavy.drive_n;
+        compare_old_audio(&mut engine, &mut reference, 48);
+        assert_eq!(
+            engine.circuits.heavy.drive_n, heavy_before,
+            "cancelled incoming chain must stop"
+        );
+
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        compare_old_audio(&mut engine, &mut reference, 4799);
+        assert_eq!(engine.circuits.preroll_remaining, 1);
+        let heavy_before = engine.circuits.heavy.drive_n;
+        let mut edge = [0.0; 2];
+        let mut old = [0.0; 2];
+        engine.render(&mut edge);
+        reference.render(&mut old);
+        assert_eq!(
+            edge[0].to_bits(),
+            old[0].to_bits(),
+            "last settling sample stays at old endpoint"
+        );
+        assert_eq!(engine.circuits.heavy.drive_n - heavy_before, 4);
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.samples_remaining, 959);
+        assert!(engine.circuits.mix.current > 0.0);
+        let blend = engine.circuits.mix.current;
+        engine.set_circuit_mode(CircuitMode::Fast);
+        assert_eq!(
+            engine.circuits.mix.current, blend,
+            "fade reversal must be continuous"
+        );
+        assert_eq!(
+            engine.circuits.preroll_remaining, 0,
+            "both chains are already running"
+        );
+        let heavy_before = engine.circuits.heavy.drive_n;
+        engine.render(&mut [0.0; 961]);
+        assert_eq!(
+            engine.circuits.heavy.drive_n - heavy_before,
+            1920,
+            "hidden chain stops at the fade endpoint inside the block"
+        );
+        assert_eq!(engine.circuits.mix.current, 0.0);
+        assert_eq!(engine.age_counter, age);
+        assert_eq!(engine.held_voice_count(), 1);
+
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        engine.reset();
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.current, 1.0);
+        engine.set_circuit_mode(CircuitMode::Fast);
+        engine.set_sample_rate(96_000.0);
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.preroll_samples, 9600);
+        assert_eq!(engine.circuits.mix.current, 0.0);
+    }
+
+    #[cfg(feature = "runtime-models")]
+    #[test]
     fn runtime_model_switch_preserves_notes_and_stops_hidden_chain() {
         let mut engine = WurliEngine::new_with_circuit_mode(48_000.0, CircuitMode::Fast);
         engine.warm_up();
@@ -1157,8 +1278,14 @@ mod tests {
         let heavy_before = engine.circuits.heavy.drive_n;
         engine.render(&mut [0.0; 128]);
         assert_eq!(engine.circuits.heavy.drive_n, heavy_before);
-        let fast_before = engine.circuits.fast.drive_n;
         engine.set_circuit_mode(CircuitMode::Heavy);
+        let mut settling = vec![0.0; engine.circuits.preroll_samples as usize];
+        engine.render(&mut settling);
+        assert!(settling.iter().all(|x| x.is_finite()));
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.current, 0.0);
+        let fast_before = engine.circuits.fast.drive_n;
+        let heavy_before = engine.circuits.heavy.drive_n;
         let mut transition = [0.0; 96];
         engine.render(&mut transition);
         assert!(transition.iter().all(|x| x.is_finite()));
