@@ -117,6 +117,38 @@ const LED_I_FULL_MA: f64 = 2.279;
 /// tabulated once at construction and linearly interpolated per sample.
 const LED_LUT_N: usize = 256;
 
+/// Exact depth-only part of the shunt calculation. Called on construction and
+/// parameter changes; the time-varying LDR branch still runs every sample.
+fn depth_divider(depth: f64) -> (f64, f64) {
+    let r_upper = R_VIB_POT * (1.0 - depth);
+    let r_lower = R_VIB_POT * depth;
+    let top = if r_upper > 0.0 {
+        r_upper * R_VIB_BRIDGE / (r_upper + R_VIB_BRIDGE)
+    } else {
+        0.0
+    };
+    (top, r_lower)
+}
+
+/// Canonical CdS power-law resistance; retained permanently for analytical
+/// evaluation, table generation and table-domain fallback. Inputs are the
+/// instance's precomputed logarithms so the native operation order is unchanged.
+#[inline]
+pub fn ldr_resistance_analytical(drive: f64, ln_max: f64, ln_range: f64, gamma: f64) -> f64 {
+    let log_r = ln_max + ln_range * drive.powf(gamma);
+    log_r.exp()
+}
+
+/// Canonical nominal CdS curve and its derivative for Hermite table generation.
+/// Component values come from this module's physical constants, once only.
+#[cfg(feature = "experimental-circuit-lut")]
+pub(crate) fn ldr_law_sample(drive: f64) -> (f64, f64) {
+    let ln_max = R_LDR_MAX.ln();
+    let ln_range = R_LDR_MIN.ln() - ln_max;
+    let value = ldr_resistance_analytical(drive, ln_max, ln_range, GAMMA);
+    (value, value * ln_range * GAMMA * drive.powf(GAMMA - 1.0))
+}
+
 pub struct Tremolo {
     // --- Oscillator state ---
     /// Behavioral: LFO phase
@@ -136,6 +168,9 @@ pub struct Tremolo {
     /// oscillator needs ~2 s to build up).
     sample_rate: f64,
     depth: f64,
+    // Depth-only divider terms: preserve the original arithmetic, evaluate only on change.
+    divider_top: f64,
+    divider_lower: f64,
     r_ldr: f64,
     ldr_envelope: f64,
     ldr_attack: f64,
@@ -185,6 +220,8 @@ const LEGACY_RATE_HZ: f64 = 5.63;
 
 impl Tremolo {
     pub fn new(depth: f64, sample_rate: f64) -> Self {
+        #[cfg(feature = "experimental-circuit-lut")]
+        crate::circuit_lut::initialize();
         Self {
             #[cfg(feature = "legacy-tremolo")]
             phase: 0.0,
@@ -206,6 +243,8 @@ impl Tremolo {
 
             sample_rate,
             depth,
+            divider_top: depth_divider(depth).0,
+            divider_lower: depth_divider(depth).1,
             r_ldr: R_LDR_MAX,
             ldr_envelope: 0.0,
             ldr_attack: (-1.0 / (ATTACK_TAU * sample_rate)).exp(),
@@ -224,7 +263,11 @@ impl Tremolo {
     }
 
     pub fn set_depth(&mut self, depth: f64) {
-        self.depth = depth.clamp(0.0, 1.0);
+        let depth = depth.clamp(0.0, 1.0);
+        if depth != self.depth {
+            self.depth = depth;
+            (self.divider_top, self.divider_lower) = depth_divider(depth);
+        }
     }
 
     /// Scale the CdS cell's attack/release time constants without changing
@@ -262,8 +305,17 @@ impl Tremolo {
         if drive < 1e-6 {
             self.r_ldr = self.r_ldr_max;
         } else {
-            let log_r = self.ln_r_max + self.ln_min_minus_max * drive.powf(self.gamma);
-            self.r_ldr = log_r.exp();
+            let native = || {
+                ldr_resistance_analytical(drive, self.ln_r_max, self.ln_min_minus_max, self.gamma)
+            };
+            #[cfg(feature = "experimental-circuit-lut")]
+            {
+                self.r_ldr = crate::circuit_lut::ldr_resistance(drive).unwrap_or_else(native);
+            }
+            #[cfg(not(feature = "experimental-circuit-lut"))]
+            {
+                self.r_ldr = native();
+            }
         }
 
         // Step 4: depth divider → shunt impedance seen by fb_junction
@@ -275,20 +327,14 @@ impl Tremolo {
     /// 50 kΩ pot split by `depth` (wiper). See the constants block for the
     /// topology. At depth = 0 the LDR branch is grounded (vibrato off).
     fn shunt_impedance(&self) -> f64 {
-        let r_upper = R_VIB_POT * (1.0 - self.depth);
-        let r_lower = R_VIB_POT * self.depth;
-        let top = if r_upper > 0.0 {
-            r_upper * R_VIB_BRIDGE / (r_upper + R_VIB_BRIDGE)
-        } else {
-            0.0
-        };
+        let r_lower = self.divider_lower;
         let branch = self.r_ldr;
         let low = if r_lower > 0.0 {
             r_lower * branch / (r_lower + branch)
         } else {
             0.0
         };
-        top + low
+        self.divider_top + low
     }
 
     /// Get the oscillator's LED drive signal (0..1).

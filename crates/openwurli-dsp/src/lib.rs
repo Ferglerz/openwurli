@@ -42,3 +42,9 @@ pub mod alias_audit;
 //
 // Without these, callers would need `openwurli_dsp::engine::WurliEngine`.
 pub use engine::{VoiceState, WurliEngine};
+
+// Temporary CPU/audio comparison candidate; excluded from defaults.
+#[cfg(feature = "experimental-circuit-lut")]
+mod circuit_lut;
+
+mod circuit_math;
