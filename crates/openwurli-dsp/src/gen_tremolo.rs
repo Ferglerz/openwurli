@@ -2228,6 +2228,9 @@ fn bjt_with_parasitics(
     // Initial guess: internal = external
     let mut vbe_int = vbe_ext;
     let mut vbc_int = vbc_ext;
+    // bjt_evaluate is pure: an early break leaves the internal voltages
+    // untouched, so its evaluation is bit-identical to a final re-evaluation.
+    let mut final_eval = None;
 
     for _iter in 0..INNER_MAX_ITER {
         let (ic, ib, jac_int) = bjt_evaluate(
@@ -2244,6 +2247,7 @@ fn bjt_with_parasitics(
         let f2 = vbc_int - vbc_ext + ib * rb - ic * rc;
 
         if f1.abs() < INNER_TOL && f2.abs() < INNER_TOL {
+            final_eval = Some((ic, ib, jac_int));
             break;
         }
 
@@ -2256,6 +2260,7 @@ fn bjt_with_parasitics(
         // Solve 2x2 via Cramer's rule
         let det = j11 * j22 - j12 * j21;
         if det.abs() < 1e-30 {
+            final_eval = Some((ic, ib, jac_int));
             break;
         }
         let inv_det = 1.0 / det;
@@ -2272,10 +2277,13 @@ fn bjt_with_parasitics(
     }
 
     // Final evaluation at converged internal voltages
-    let (ic, ib, jac_int) = bjt_evaluate(
-        vbe_int, vbc_int, is, vt, nf, nr, beta_f, beta_r, sign, use_gp, vaf, var, ikf, ikr, ise,
-        ne, isc, nc,
-    );
+    let (ic, ib, jac_int) = match final_eval {
+        Some(eval) => eval,
+        None => bjt_evaluate(
+            vbe_int, vbc_int, is, vt, nf, nr, beta_f, beta_r, sign, use_gp, vaf, var, ikf, ikr,
+            ise, ne, isc, nc,
+        ),
+    };
 
     // External Jacobian: J_ext = J_device * J_F^{-1}
     // J_F = [[j11, j12], [j21, j22]] (recompute at converged point)
