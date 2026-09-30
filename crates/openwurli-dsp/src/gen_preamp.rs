@@ -5525,3 +5525,408 @@ pub fn process_sample(input: f64, state: &mut CircuitState) -> [f64; NUM_OUTPUTS
     }
     output
 }
+
+#[cfg(test)]
+mod exactness_tests {
+    use super::*;
+    use crate::bjt_lockstep::test_support::{BjtParams, Lcg, result_bits};
+
+    fn bits<const R: usize, const C: usize>(m: &[[f64; C]; R]) -> Vec<u64> {
+        m.iter().flatten().map(|x| x.to_bits()).collect()
+    }
+
+    fn matrix_bits(st: &CircuitState) -> Vec<u64> {
+        [
+            bits(&st.a),
+            bits(&st.a_neg),
+            bits(&st.a_be),
+            bits(&st.a_neg_be),
+            bits(&st.a_neg_sub),
+            bits(&st.s),
+            bits(&st.s_ni),
+            bits(&st.k),
+            bits(&st.s_be),
+            bits(&st.s_ni_be),
+            bits(&st.k_be),
+        ]
+        .concat()
+    }
+
+    /// The generated `invert_n`: one substitution per identity column.
+    fn generated_invert_n(a: &[[f64; N]; N]) -> Option<[[f64; N]; N]> {
+        let mut lu = *a;
+        let mut perm = [0usize; N];
+        for i in 0..N {
+            perm[i] = i;
+        }
+        for k in 0..N {
+            let mut max_row = k;
+            let mut max_val = lu[k][k].abs();
+            for i in (k + 1)..N {
+                let v = lu[i][k].abs();
+                if v > max_val {
+                    max_val = v;
+                    max_row = i;
+                }
+            }
+            if max_val < 1e-30 {
+                return None;
+            }
+            if max_row != k {
+                lu.swap(k, max_row);
+                perm.swap(k, max_row);
+            }
+            let pivot = lu[k][k];
+            for i in (k + 1)..N {
+                let m = lu[i][k] / pivot;
+                lu[i][k] = m;
+                for j in (k + 1)..N {
+                    lu[i][j] -= m * lu[k][j];
+                }
+            }
+        }
+        let mut result = [[0.0f64; N]; N];
+        for col in 0..N {
+            let mut b = [0.0f64; N];
+            let mut start = N;
+            for i in 0..N {
+                if perm[i] == col {
+                    b[i] = 1.0;
+                    start = i;
+                    break;
+                }
+            }
+            for i in (start + 1)..N {
+                let mut sum = b[i];
+                for j in start..i {
+                    sum -= lu[i][j] * b[j];
+                }
+                b[i] = sum;
+            }
+            for i in (0..N).rev() {
+                let mut sum = b[i];
+                for j in (i + 1)..N {
+                    sum -= lu[i][j] * b[j];
+                }
+                let pivot = lu[i][i];
+                if pivot.abs() < 1e-30 {
+                    return None;
+                }
+                b[i] = sum / pivot;
+            }
+            for i in 0..N {
+                result[i][col] = b[i];
+            }
+        }
+        Some(result)
+    }
+
+    fn dense_products(s: &[[f64; N]; N]) -> ([[f64; M]; N], [[f64; M]; M]) {
+        let mut s_ni = [[0.0; M]; N];
+        for i in 0..N {
+            for j in 0..M {
+                let mut sum = 0.0;
+                for a in 0..N {
+                    sum += s[i][a] * N_I[a][j];
+                }
+                s_ni[i][j] = sum;
+            }
+        }
+        let mut k = [[0.0; M]; M];
+        for i in 0..M {
+            for j in 0..M {
+                let mut sum = 0.0;
+                for a in 0..N {
+                    sum += N_V[i][a] * s_ni[a][j];
+                }
+                k[i][j] = sum;
+            }
+        }
+        (s_ni, k)
+    }
+
+    /// The generated `rebuild_matrices`: two independent inversions with
+    /// dense Schur products.
+    fn generated_rebuild(st: &mut CircuitState, internal_rate: f64) {
+        let alpha = internal_rate;
+        let alpha_be = internal_rate;
+        let alpha_sub = 4.0 * internal_rate;
+        for i in 0..N {
+            for j in 0..N {
+                st.a[i][j] = st.g_work[i][j] + alpha * st.c_work[i][j];
+                st.a_neg[i][j] = alpha * st.c_work[i][j];
+                st.a_be[i][j] = st.g_work[i][j] + alpha_be * st.c_work[i][j];
+                st.a_neg_be[i][j] = alpha_be * st.c_work[i][j];
+            }
+        }
+        for i in 0..N {
+            for j in 0..N {
+                st.a_neg_sub[i][j] = alpha_sub * st.c_work[i][j] - st.g_work[i][j];
+            }
+        }
+        for j in 0..N {
+            st.a_neg[12][j] = 0.0;
+            st.a_neg_be[12][j] = 0.0;
+            st.a_neg_sub[12][j] = 0.0;
+        }
+        if let Some(inv) = generated_invert_n(&st.a) {
+            st.s = inv;
+            (st.s_ni, st.k) = dense_products(&st.s);
+        }
+        if let Some(inv) = generated_invert_n(&st.a_be) {
+            st.s_be = inv;
+            (st.s_ni_be, st.k_be) = dense_products(&st.s_be);
+        }
+        st.chord_valid = false;
+    }
+
+    const RATES: [f64; 4] = [44_100.0, 48_000.0, 88_200.0, 192_000.0];
+
+    fn state_at(rate: f64, r_ldr: f64) -> CircuitState {
+        let mut st = CircuitState::default();
+        st.set_sample_rate(rate);
+        st.set_runtime_R_r_ldr(r_ldr);
+        st
+    }
+
+    fn system_matrices() -> Vec<[[f64; N]; N]> {
+        let mut out = Vec::new();
+        for rate in RATES {
+            for r in [1_000.0, 4_700.0, 33_000.0, 150_000.0, 1_000_000.0] {
+                let mut st = state_at(rate, r);
+                st.rebuild_matrices(rate * OVERSAMPLING_FACTOR as f64);
+                out.push(st.a);
+            }
+        }
+        let mut rng = Lcg(0x5eed);
+        let base = out[0];
+        for _ in 0..64 {
+            let mut sparse = base;
+            for x in sparse.iter_mut().flatten() {
+                if *x != 0.0 {
+                    *x *= rng.range(0.25, 4.0);
+                } else if rng.unit() < 0.5 {
+                    *x = -0.0;
+                }
+            }
+            out.push(sparse);
+            let mut dense = [[0.0; N]; N];
+            for i in 0..N {
+                for j in 0..N {
+                    dense[i][j] = rng.range(-1.0, 1.0);
+                }
+                dense[i][i] += if rng.unit() < 0.5 { -2.0 } else { 2.0 };
+            }
+            out.push(dense);
+        }
+        out
+    }
+
+    #[test]
+    fn invert_n_matches_generated_substitution() {
+        let mut cases = system_matrices();
+        cases.push([[0.0; N]; N]);
+        let mut non_finite = cases[0];
+        non_finite[3][5] = f64::INFINITY;
+        cases.push(non_finite);
+        let mut nan = cases[1];
+        nan[7][7] = f64::NAN;
+        cases.push(nan);
+        for a in &cases {
+            assert_eq!(
+                invert_n(a).map(|m| bits(&m)),
+                generated_invert_n(a).map(|m| bits(&m))
+            );
+        }
+    }
+
+    #[test]
+    fn schur_products_match_dense_products() {
+        let mut rng = Lcg(7);
+        for a in system_matrices() {
+            let Some(mut s) = invert_n(&a) else {
+                continue;
+            };
+            for pass in 0..3 {
+                if pass == 1 {
+                    for x in s.iter_mut().flatten() {
+                        let u = rng.unit();
+                        if u < 0.1 {
+                            *x = -0.0;
+                        } else if u < 0.2 {
+                            *x = 0.0;
+                        }
+                    }
+                }
+                if pass == 2 {
+                    s[(rng.unit() * N as f64) as usize][(rng.unit() * N as f64) as usize] =
+                        f64::INFINITY;
+                }
+                let (mut s_ni, mut k) = ([[0.0; M]; N], [[0.0; M]; M]);
+                schur_products(&s, &mut s_ni, &mut k);
+                let (s_ni_dense, k_dense) = dense_products(&s);
+                assert_eq!(bits(&s_ni), bits(&s_ni_dense));
+                assert_eq!(bits(&k), bits(&k_dense));
+            }
+        }
+    }
+
+    #[test]
+    fn rebuild_matches_generated_rebuild() {
+        let mut rng = Lcg(11);
+        for rate in RATES {
+            for _ in 0..12 {
+                let st = state_at(rate, 1_000.0 * 1_000.0f64.powf(rng.unit()));
+                let internal_rate = rate * OVERSAMPLING_FACTOR as f64;
+                let (mut fast, mut generated) = (st.clone(), st);
+                fast.rebuild_matrices(internal_rate);
+                generated_rebuild(&mut generated, internal_rate);
+                assert_eq!(matrix_bits(&fast), matrix_bits(&generated));
+            }
+        }
+    }
+
+    #[test]
+    fn shared_rebuild_matches_independent_rebuilds() {
+        for rate in RATES {
+            let mut main = state_at(rate, 100_000.0);
+            let mut shadow = main.clone();
+            let mut solo = main.clone();
+            let mut rng = Lcg(rate as u64);
+            for step in 0..24 {
+                let r = 1_000.0 * 1_000.0f64.powf(rng.unit());
+                for st in [&mut main, &mut shadow, &mut solo] {
+                    st.set_runtime_R_r_ldr(r);
+                }
+                assert!(main.matrices_dirty && shadow.matrices_dirty);
+                main.rebuild_pending_shared(&mut shadow);
+                assert!(!main.matrices_dirty && !shadow.matrices_dirty);
+                generated_rebuild(&mut solo, rate * OVERSAMPLING_FACTOR as f64);
+                solo.matrices_dirty = false;
+                assert_eq!(matrix_bits(&main), matrix_bits(&solo));
+                assert_eq!(matrix_bits(&shadow), matrix_bits(&solo));
+                for n in 0..32 {
+                    let x = 0.2 * ((step * 32 + n) as f64 * 0.37).sin();
+                    let expected = process_sample(x, &mut solo);
+                    assert_eq!(process_sample(x, &mut main), expected);
+                    assert_eq!(process_sample(x, &mut shadow), expected);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn shared_rebuild_leaves_unshareable_rebuilds_pending() {
+        let mut base = state_at(48_000.0, 100_000.0);
+        base.rebuild_matrices(48_000.0 * OVERSAMPLING_FACTOR as f64);
+        base.matrices_dirty = false;
+
+        let (mut main, mut shadow) = (base.clone(), base.clone());
+        main.set_runtime_R_r_ldr(10_000.0);
+        shadow.set_runtime_R_r_ldr(20_000.0);
+        main.rebuild_pending_shared(&mut shadow);
+        assert!(main.matrices_dirty && shadow.matrices_dirty);
+
+        let (mut main, mut clean) = (base.clone(), base.clone());
+        main.set_runtime_R_r_ldr(10_000.0);
+        main.rebuild_pending_shared(&mut clean);
+        assert!(main.matrices_dirty && !clean.matrices_dirty);
+
+        let (mut main, mut other_rate) = (base.clone(), state_at(96_000.0, 100_000.0));
+        main.set_runtime_R_r_ldr(10_000.0);
+        other_rate.set_runtime_R_r_ldr(10_000.0);
+        main.rebuild_pending_shared(&mut other_rate);
+        assert!(main.matrices_dirty && other_rate.matrices_dirty);
+
+        // Singular: `main` keeps its old inverse, `shadow` rebuilds on its own.
+        let mut singular = base;
+        singular.g_work = [[0.0; N]; N];
+        singular.c_work = [[0.0; N]; N];
+        singular.matrices_dirty = true;
+        let (mut main, mut shadow, mut solo) =
+            (singular.clone(), singular.clone(), singular.clone());
+        main.rebuild_pending_shared(&mut shadow);
+        assert!(!main.matrices_dirty && shadow.matrices_dirty);
+        generated_rebuild(&mut solo, 48_000.0 * OVERSAMPLING_FACTOR as f64);
+        assert_eq!(matrix_bits(&main), matrix_bits(&solo));
+        assert_eq!(matrix_bits(&shadow), matrix_bits(&singular));
+    }
+
+    fn device_params(st: &CircuitState) -> [BjtParams; 2] {
+        [
+            BjtParams {
+                is: st.device_1_is,
+                vt: st.device_1_vt,
+                nf: DEVICE_1_NF,
+                nr: DEVICE_1_NR,
+                beta_f: st.device_1_bf,
+                beta_r: st.device_1_br,
+                sign: DEVICE_1_SIGN,
+                use_gp: DEVICE_1_USE_GP,
+                vaf: DEVICE_1_VAF,
+                var: DEVICE_1_VAR,
+                ikf: DEVICE_1_IKF,
+                ikr: DEVICE_1_IKR,
+                ise: DEVICE_1_ISE,
+                ne: DEVICE_1_NE,
+                isc: DEVICE_1_ISC,
+                nc: DEVICE_1_NC,
+                rb: DEVICE_1_RB,
+                rc: DEVICE_1_RC,
+                re: DEVICE_1_RE,
+            },
+            BjtParams {
+                is: st.device_2_is,
+                vt: st.device_2_vt,
+                nf: DEVICE_2_NF,
+                nr: DEVICE_2_NR,
+                beta_f: st.device_2_bf,
+                beta_r: st.device_2_br,
+                sign: DEVICE_2_SIGN,
+                use_gp: DEVICE_2_USE_GP,
+                vaf: DEVICE_2_VAF,
+                var: DEVICE_2_VAR,
+                ikf: DEVICE_2_IKF,
+                ikr: DEVICE_2_IKR,
+                ise: DEVICE_2_ISE,
+                ne: DEVICE_2_NE,
+                isc: DEVICE_2_ISC,
+                nc: DEVICE_2_NC,
+                rb: DEVICE_2_RB,
+                rc: DEVICE_2_RC,
+                re: DEVICE_2_RE,
+            },
+        ]
+    }
+
+    fn scalar(p: &BjtParams, [vbe, vbc]: [f64; 2]) -> (f64, f64, [f64; 4]) {
+        bjt_with_parasitics(
+            vbe, vbc, p.is, p.vt, p.nf, p.nr, p.beta_f, p.beta_r, p.sign, p.use_gp, p.vaf, p.var,
+            p.ikf, p.ikr, p.ise, p.ne, p.isc, p.nc, p.rb, p.rc, p.re,
+        )
+    }
+
+    #[test]
+    fn lockstep_bjt_matches_scalar() {
+        let [d1, d2] = device_params(&CircuitState::default());
+        let mut rng = Lcg(3);
+        for (p1, p2) in d1
+            .with_branch_variants()
+            .into_iter()
+            .zip(d2.with_branch_variants())
+        {
+            let params = [p1, p2];
+            let args = params.map(|p| p.args());
+            for _ in 0..20_000 {
+                let ext = [rng.junction_voltages(), rng.junction_voltages()];
+                let batched = bjt_with_parasitics_lockstep(ext, &args);
+                for d in 0..2 {
+                    assert_eq!(
+                        result_bits(batched[d]),
+                        result_bits(scalar(&params[d], ext[d]))
+                    );
+                }
+            }
+        }
+    }
+}

@@ -12113,3 +12113,189 @@ pub fn process_sample(input: f64, state: &mut CircuitState) -> [f64; NUM_OUTPUTS
     }
     output
 }
+
+#[cfg(test)]
+mod exactness_tests {
+    use super::*;
+    use crate::bjt_lockstep::test_support::{BjtParams, Lcg, result_bits};
+
+    /// Generated device parameters at their default temperature.
+    fn device_params() -> [BjtParams; 7] {
+        [
+            BjtParams {
+                is: DEVICE_0_IS,
+                vt: DEVICE_0_VT,
+                nf: DEVICE_0_NF,
+                nr: DEVICE_0_NR,
+                beta_f: DEVICE_0_BETA_F,
+                beta_r: DEVICE_0_BETA_R,
+                sign: DEVICE_0_SIGN,
+                use_gp: DEVICE_0_USE_GP,
+                vaf: DEVICE_0_VAF,
+                var: DEVICE_0_VAR,
+                ikf: DEVICE_0_IKF,
+                ikr: DEVICE_0_IKR,
+                ise: DEVICE_0_ISE,
+                ne: DEVICE_0_NE,
+                isc: DEVICE_0_ISC,
+                nc: DEVICE_0_NC,
+                rb: DEVICE_0_RB,
+                rc: DEVICE_0_RC,
+                re: DEVICE_0_RE,
+            },
+            BjtParams {
+                is: DEVICE_1_IS,
+                vt: DEVICE_1_VT,
+                nf: DEVICE_1_NF,
+                nr: DEVICE_1_NR,
+                beta_f: DEVICE_1_BETA_F,
+                beta_r: DEVICE_1_BETA_R,
+                sign: DEVICE_1_SIGN,
+                use_gp: DEVICE_1_USE_GP,
+                vaf: DEVICE_1_VAF,
+                var: DEVICE_1_VAR,
+                ikf: DEVICE_1_IKF,
+                ikr: DEVICE_1_IKR,
+                ise: DEVICE_1_ISE,
+                ne: DEVICE_1_NE,
+                isc: DEVICE_1_ISC,
+                nc: DEVICE_1_NC,
+                rb: DEVICE_1_RB,
+                rc: DEVICE_1_RC,
+                re: DEVICE_1_RE,
+            },
+            BjtParams {
+                is: DEVICE_2_IS,
+                vt: DEVICE_2_VT,
+                nf: DEVICE_2_NF,
+                nr: DEVICE_2_NR,
+                beta_f: DEVICE_2_BETA_F,
+                beta_r: DEVICE_2_BETA_R,
+                sign: DEVICE_2_SIGN,
+                use_gp: DEVICE_2_USE_GP,
+                vaf: DEVICE_2_VAF,
+                var: DEVICE_2_VAR,
+                ikf: DEVICE_2_IKF,
+                ikr: DEVICE_2_IKR,
+                ise: DEVICE_2_ISE,
+                ne: DEVICE_2_NE,
+                isc: DEVICE_2_ISC,
+                nc: DEVICE_2_NC,
+                rb: DEVICE_2_RB,
+                rc: DEVICE_2_RC,
+                re: DEVICE_2_RE,
+            },
+            BjtParams {
+                is: DEVICE_3_IS,
+                vt: DEVICE_3_VT,
+                nf: DEVICE_3_NF,
+                nr: DEVICE_3_NR,
+                beta_f: DEVICE_3_BETA_F,
+                beta_r: DEVICE_3_BETA_R,
+                sign: DEVICE_3_SIGN,
+                use_gp: DEVICE_3_USE_GP,
+                vaf: DEVICE_3_VAF,
+                var: DEVICE_3_VAR,
+                ikf: DEVICE_3_IKF,
+                ikr: DEVICE_3_IKR,
+                ise: DEVICE_3_ISE,
+                ne: DEVICE_3_NE,
+                isc: DEVICE_3_ISC,
+                nc: DEVICE_3_NC,
+                rb: DEVICE_3_RB,
+                rc: DEVICE_3_RC,
+                re: DEVICE_3_RE,
+            },
+            BjtParams {
+                is: DEVICE_4_IS,
+                vt: DEVICE_4_VT,
+                nf: DEVICE_4_NF,
+                nr: DEVICE_4_NR,
+                beta_f: DEVICE_4_BETA_F,
+                beta_r: DEVICE_4_BETA_R,
+                sign: DEVICE_4_SIGN,
+                use_gp: DEVICE_4_USE_GP,
+                vaf: DEVICE_4_VAF,
+                var: DEVICE_4_VAR,
+                ikf: DEVICE_4_IKF,
+                ikr: DEVICE_4_IKR,
+                ise: DEVICE_4_ISE,
+                ne: DEVICE_4_NE,
+                isc: DEVICE_4_ISC,
+                nc: DEVICE_4_NC,
+                rb: DEVICE_4_RB,
+                rc: DEVICE_4_RC,
+                re: DEVICE_4_RE,
+            },
+            BjtParams {
+                is: DEVICE_5_IS,
+                vt: DEVICE_5_VT,
+                nf: DEVICE_5_NF,
+                nr: DEVICE_5_NR,
+                beta_f: DEVICE_5_BETA_F,
+                beta_r: DEVICE_5_BETA_R,
+                sign: DEVICE_5_SIGN,
+                use_gp: DEVICE_5_USE_GP,
+                vaf: DEVICE_5_VAF,
+                var: DEVICE_5_VAR,
+                ikf: DEVICE_5_IKF,
+                ikr: DEVICE_5_IKR,
+                ise: DEVICE_5_ISE,
+                ne: DEVICE_5_NE,
+                isc: DEVICE_5_ISC,
+                nc: DEVICE_5_NC,
+                rb: DEVICE_5_RB,
+                rc: DEVICE_5_RC,
+                re: DEVICE_5_RE,
+            },
+            BjtParams {
+                is: DEVICE_6_IS,
+                vt: DEVICE_6_VT,
+                nf: DEVICE_6_NF,
+                nr: DEVICE_6_NR,
+                beta_f: DEVICE_6_BETA_F,
+                beta_r: DEVICE_6_BETA_R,
+                sign: DEVICE_6_SIGN,
+                use_gp: DEVICE_6_USE_GP,
+                vaf: DEVICE_6_VAF,
+                var: DEVICE_6_VAR,
+                ikf: DEVICE_6_IKF,
+                ikr: DEVICE_6_IKR,
+                ise: DEVICE_6_ISE,
+                ne: DEVICE_6_NE,
+                isc: DEVICE_6_ISC,
+                nc: DEVICE_6_NC,
+                rb: DEVICE_6_RB,
+                rc: DEVICE_6_RC,
+                re: DEVICE_6_RE,
+            },
+        ]
+    }
+
+    fn scalar(p: &BjtParams, [vbe, vbc]: [f64; 2]) -> (f64, f64, [f64; 4]) {
+        bjt_with_parasitics(
+            vbe, vbc, p.is, p.vt, p.nf, p.nr, p.beta_f, p.beta_r, p.sign, p.use_gp, p.vaf, p.var,
+            p.ikf, p.ikr, p.ise, p.ne, p.isc, p.nc, p.rb, p.rc, p.re,
+        )
+    }
+
+    #[test]
+    fn lockstep_bjt_matches_scalar() {
+        let devices = device_params().map(|p| p.with_branch_variants());
+        let mut rng = Lcg(5);
+        for variant in 0..5 {
+            let params = devices.map(|v| v[variant]);
+            let args = params.map(|p| p.args());
+            for _ in 0..10_000 {
+                let ext: [[f64; 2]; 7] = std::array::from_fn(|_| rng.junction_voltages());
+                let batched = bjt_with_parasitics_lockstep(ext, &args);
+                for d in 0..7 {
+                    assert_eq!(
+                        result_bits(batched[d]),
+                        result_bits(scalar(&params[d], ext[d]))
+                    );
+                }
+            }
+        }
+    }
+}

@@ -378,3 +378,124 @@ pub(crate) fn bjt_with_parasitics_lockstep<const K: usize>(
     }
     out
 }
+
+#[cfg(test)]
+pub(crate) mod test_support {
+    use super::BjtArgs;
+
+    /// Arguments of a generated scalar `bjt_with_parasitics` after the two
+    /// external junction voltages, in declaration order.
+    #[derive(Clone, Copy)]
+    pub(crate) struct BjtParams {
+        pub is: f64,
+        pub vt: f64,
+        pub nf: f64,
+        pub nr: f64,
+        pub beta_f: f64,
+        pub beta_r: f64,
+        pub sign: f64,
+        pub use_gp: bool,
+        pub vaf: f64,
+        pub var: f64,
+        pub ikf: f64,
+        pub ikr: f64,
+        pub ise: f64,
+        pub ne: f64,
+        pub isc: f64,
+        pub nc: f64,
+        pub rb: f64,
+        pub rc: f64,
+        pub re: f64,
+    }
+
+    impl BjtParams {
+        pub(crate) fn args(&self) -> BjtArgs {
+            BjtArgs::new(
+                self.is,
+                self.vt,
+                self.nf,
+                self.nr,
+                self.beta_f,
+                self.beta_r,
+                self.sign,
+                self.use_gp,
+                self.vaf,
+                self.var,
+                self.ikf,
+                self.ikr,
+                self.ise,
+                self.ne,
+                self.isc,
+                self.nc,
+                self.rb,
+                self.rc,
+                self.re,
+            )
+        }
+
+        /// `self` plus variants reaching the Ebers-Moll, no-leakage,
+        /// no-parasitic and PNP branches.
+        pub(crate) fn with_branch_variants(self) -> [BjtParams; 5] {
+            [
+                self,
+                BjtParams {
+                    use_gp: false,
+                    ..self
+                },
+                BjtParams {
+                    ise: 0.0,
+                    isc: 0.0,
+                    ..self
+                },
+                BjtParams {
+                    rb: 0.0,
+                    rc: 0.0,
+                    re: 0.0,
+                    ..self
+                },
+                BjtParams {
+                    sign: -self.sign,
+                    ..self
+                },
+            ]
+        }
+    }
+
+    pub(crate) struct Lcg(pub u64);
+
+    impl Lcg {
+        pub(crate) fn unit(&mut self) -> f64 {
+            self.0 = self
+                .0
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            (self.0 >> 11) as f64 / (1u64 << 53) as f64
+        }
+
+        pub(crate) fn range(&mut self, lo: f64, hi: f64) -> f64 {
+            lo + (hi - lo) * self.unit()
+        }
+
+        /// External (Vbe, Vbc) spanning cutoff, forward-active, saturation and
+        /// drives far enough past the knee to exhaust the inner iterations.
+        pub(crate) fn junction_voltages(&mut self) -> [f64; 2] {
+            match (self.unit() * 4.0) as usize {
+                0 => [self.range(0.4, 0.9), self.range(-25.0, 0.0)],
+                1 => [self.range(-3.0, 1.2), self.range(-40.0, 1.2)],
+                2 => [self.range(1.2, 6.0), self.range(-2.0, 6.0)],
+                _ => [self.range(-1e-3, 1e-3), self.range(-1e-3, 1e-3)],
+            }
+        }
+    }
+
+    pub(crate) fn result_bits((ic, ib, jac): (f64, f64, [f64; 4])) -> [u64; 6] {
+        [
+            ic.to_bits(),
+            ib.to_bits(),
+            jac[0].to_bits(),
+            jac[1].to_bits(),
+            jac[2].to_bits(),
+            jac[3].to_bits(),
+        ]
+    }
+}
