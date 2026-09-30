@@ -44,6 +44,8 @@
 #![allow(unused_mut)]
 #![allow(clippy::manual_memcpy)]
 
+use crate::bjt_lockstep::{BjtArgs, bjt_with_parasitics_lockstep};
+
 // =============================================================================
 // CONSTANTS: Compile-time circuit topology (Nodal solver)
 // =============================================================================
@@ -4649,6 +4651,50 @@ pub fn process_sample(input: f64, state: &mut CircuitState) -> [f64; NUM_OUTPUTS
     for i in 0..M {
         i_nl[i] = 2.0 * state.i_nl_prev[i] - state.i_nl_prev_prev[i];
     }
+    let bjt_args: [BjtArgs; 2] = [
+        BjtArgs::new(
+            state.device_1_is,
+            state.device_1_vt,
+            DEVICE_1_NF,
+            DEVICE_1_NR,
+            state.device_1_bf,
+            state.device_1_br,
+            DEVICE_1_SIGN,
+            DEVICE_1_USE_GP,
+            DEVICE_1_VAF,
+            DEVICE_1_VAR,
+            DEVICE_1_IKF,
+            DEVICE_1_IKR,
+            DEVICE_1_ISE,
+            DEVICE_1_NE,
+            DEVICE_1_ISC,
+            DEVICE_1_NC,
+            DEVICE_1_RB,
+            DEVICE_1_RC,
+            DEVICE_1_RE,
+        ),
+        BjtArgs::new(
+            state.device_2_is,
+            state.device_2_vt,
+            DEVICE_2_NF,
+            DEVICE_2_NR,
+            state.device_2_bf,
+            state.device_2_br,
+            DEVICE_2_SIGN,
+            DEVICE_2_USE_GP,
+            DEVICE_2_VAF,
+            DEVICE_2_VAR,
+            DEVICE_2_IKF,
+            DEVICE_2_IKR,
+            DEVICE_2_ISE,
+            DEVICE_2_NE,
+            DEVICE_2_ISC,
+            DEVICE_2_NC,
+            DEVICE_2_RB,
+            DEVICE_2_RC,
+            DEVICE_2_RE,
+        ),
+    ];
     state.last_nr_iterations = MAX_ITER as u32;
 
     for iter in 0..MAX_ITER {
@@ -4687,56 +4733,12 @@ pub fn process_sample(input: f64, state: &mut CircuitState) -> [f64; NUM_OUTPUTS
         // 4b. Evaluate device currents and Jacobians
         let i_dev0 = diode_current(v_d0, state.device_0_is, state.device_0_n_vt);
         let jdev_0_0 = diode_conductance(v_d0, state.device_0_is, state.device_0_n_vt);
-        let (i_dev1, i_dev2, bjt1_jac) = bjt_with_parasitics(
-            v_d1,
-            v_d2,
-            state.device_1_is,
-            state.device_1_vt,
-            DEVICE_1_NF,
-            DEVICE_1_NR,
-            state.device_1_bf,
-            state.device_1_br,
-            DEVICE_1_SIGN,
-            DEVICE_1_USE_GP,
-            DEVICE_1_VAF,
-            DEVICE_1_VAR,
-            DEVICE_1_IKF,
-            DEVICE_1_IKR,
-            DEVICE_1_ISE,
-            DEVICE_1_NE,
-            DEVICE_1_ISC,
-            DEVICE_1_NC,
-            DEVICE_1_RB,
-            DEVICE_1_RC,
-            DEVICE_1_RE,
-        );
+        let [(i_dev1, i_dev2, bjt1_jac), (i_dev3, i_dev4, bjt2_jac)] =
+            bjt_with_parasitics_lockstep([[v_d1, v_d2], [v_d3, v_d4]], &bjt_args);
         let jdev_1_1 = bjt1_jac[0];
         let jdev_1_2 = bjt1_jac[1];
         let jdev_2_1 = bjt1_jac[2];
         let jdev_2_2 = bjt1_jac[3];
-        let (i_dev3, i_dev4, bjt2_jac) = bjt_with_parasitics(
-            v_d3,
-            v_d4,
-            state.device_2_is,
-            state.device_2_vt,
-            DEVICE_2_NF,
-            DEVICE_2_NR,
-            state.device_2_bf,
-            state.device_2_br,
-            DEVICE_2_SIGN,
-            DEVICE_2_USE_GP,
-            DEVICE_2_VAF,
-            DEVICE_2_VAR,
-            DEVICE_2_IKF,
-            DEVICE_2_IKR,
-            DEVICE_2_ISE,
-            DEVICE_2_NE,
-            DEVICE_2_ISC,
-            DEVICE_2_NC,
-            DEVICE_2_RB,
-            DEVICE_2_RC,
-            DEVICE_2_RE,
-        );
         let jdev_3_3 = bjt2_jac[0];
         let jdev_3_4 = bjt2_jac[1];
         let jdev_4_3 = bjt2_jac[2];

@@ -21,6 +21,7 @@ pub mod preamp;
 pub mod tremolo;
 
 // Output stage
+mod bjt_lockstep;
 pub mod gen_power_amp;
 #[cfg(not(feature = "legacy-tremolo"))]
 pub mod gen_tremolo;
