@@ -3450,6 +3450,9 @@ fn bjt_with_parasitics(
     // Initial guess: internal = external
     let mut vbe_int = vbe_ext;
     let mut vbc_int = vbc_ext;
+    // bjt_evaluate is pure: an early break leaves the internal voltages
+    // untouched, so its evaluation is bit-identical to a final re-evaluation.
+    let mut final_eval = None;
 
     for _iter in 0..INNER_MAX_ITER {
         let (ic, ib, jac_int) = bjt_evaluate(
@@ -3466,6 +3469,7 @@ fn bjt_with_parasitics(
         let f2 = vbc_int - vbc_ext + ib * rb - ic * rc;
 
         if f1.abs() < INNER_TOL && f2.abs() < INNER_TOL {
+            final_eval = Some((ic, ib, jac_int));
             break;
         }
 
@@ -3478,6 +3482,7 @@ fn bjt_with_parasitics(
         // Solve 2x2 via Cramer's rule
         let det = j11 * j22 - j12 * j21;
         if det.abs() < 1e-30 {
+            final_eval = Some((ic, ib, jac_int));
             break;
         }
         let inv_det = 1.0 / det;
@@ -3494,10 +3499,13 @@ fn bjt_with_parasitics(
     }
 
     // Final evaluation at converged internal voltages
-    let (ic, ib, jac_int) = bjt_evaluate(
-        vbe_int, vbc_int, is, vt, nf, nr, beta_f, beta_r, sign, use_gp, vaf, var, ikf, ikr, ise,
-        ne, isc, nc,
-    );
+    let (ic, ib, jac_int) = match final_eval {
+        Some(eval) => eval,
+        None => bjt_evaluate(
+            vbe_int, vbc_int, is, vt, nf, nr, beta_f, beta_r, sign, use_gp, vaf, var, ikf, ikr,
+            ise, ne, isc, nc,
+        ),
+    };
 
     // External Jacobian: J_ext = J_device * J_F^{-1}
     // J_F = [[j11, j12], [j21, j22]] (recompute at converged point)
@@ -4100,6 +4108,12 @@ impl CircuitState {
     /// Also recomputes the Schur matrices S, K, S_NI (and BE variants),
     /// which includes O(N^3) matrix inversion.
     pub fn rebuild_matrices(&mut self, internal_rate: f64) {
+        self.rebuild_matrices_checked(internal_rate);
+    }
+
+    /// `rebuild_matrices`, returning whether every inverse was refreshed.
+    /// A failed inversion leaves that inverse and its products unchanged.
+    fn rebuild_matrices_checked(&mut self, internal_rate: f64) -> bool {
         let alpha = internal_rate; // backward Euler: alpha = 1/T
         let alpha_be = internal_rate;
         let alpha_sub = 4.0 * internal_rate; // trap at 2× rate
@@ -4130,56 +4144,67 @@ impl CircuitState {
         }
 
         // Recompute S = A^{-1} (trapezoidal)
-        if let Some(inv) = invert_n(&self.a) {
+        let trap_inverted = if let Some(inv) = invert_n(&self.a) {
             self.s = inv;
-            // S_NI = S * N_i
-            for i in 0..N {
-                for j in 0..M {
-                    let mut sum = 0.0;
-                    for a in 0..N {
-                        sum += self.s[i][a] * N_I[a][j];
-                    }
-                    self.s_ni[i][j] = sum;
-                }
+            schur_products(&self.s, &mut self.s_ni, &mut self.k);
+            true
+        } else {
+            false
+        };
+        // Recompute S_be = A_be^{-1} (backward Euler). With alpha_be == alpha
+        // the matrices are bit-identical, and so is every derived product.
+        let be_inverted = if same_bits(&self.a_be, &self.a) {
+            if trap_inverted {
+                self.s_be = self.s;
+                self.s_ni_be = self.s_ni;
+                self.k_be = self.k;
             }
-            // K = N_v * S_NI
-            for i in 0..M {
-                for j in 0..M {
-                    let mut sum = 0.0;
-                    for a in 0..N {
-                        sum += N_V[i][a] * self.s_ni[a][j];
-                    }
-                    self.k[i][j] = sum;
-                }
-            }
-        }
-        // Recompute S_be = A_be^{-1} (backward Euler)
-        if let Some(inv) = invert_n(&self.a_be) {
+            trap_inverted
+        } else if let Some(inv) = invert_n(&self.a_be) {
             self.s_be = inv;
-            // S_NI = S * N_i
-            for i in 0..N {
-                for j in 0..M {
-                    let mut sum = 0.0;
-                    for a in 0..N {
-                        sum += self.s_be[i][a] * N_I[a][j];
-                    }
-                    self.s_ni_be[i][j] = sum;
-                }
-            }
-            // K = N_v * S_NI
-            for i in 0..M {
-                for j in 0..M {
-                    let mut sum = 0.0;
-                    for a in 0..N {
-                        sum += N_V[i][a] * self.s_ni_be[a][j];
-                    }
-                    self.k_be[i][j] = sum;
-                }
-            }
-        }
+            schur_products(&self.s_be, &mut self.s_ni_be, &mut self.k_be);
+            true
+        } else {
+            false
+        };
 
         // Invalidate chord LU cache (matrices changed)
         self.chord_valid = false;
+        trap_inverted && be_inverted
+    }
+
+    /// Perform the lazy rebuild both states would do at their next
+    /// `process_sample`, inverting once when their G, C and sample rate are
+    /// bit-identical. Otherwise, or if an inversion fails, `other` keeps its
+    /// pending rebuild and performs it itself.
+    pub fn rebuild_pending_shared(&mut self, other: &mut CircuitState) {
+        let shareable = self.matrices_dirty
+            && other.matrices_dirty
+            && self.current_sample_rate.to_bits() == other.current_sample_rate.to_bits()
+            && same_bits(&self.g_work, &other.g_work)
+            && same_bits(&self.c_work, &other.c_work);
+        if !shareable {
+            return;
+        }
+        let internal_rate = self.current_sample_rate * OVERSAMPLING_FACTOR as f64;
+        let refreshed = self.rebuild_matrices_checked(internal_rate);
+        self.matrices_dirty = false;
+        if !refreshed {
+            return;
+        }
+        other.a = self.a;
+        other.a_neg = self.a_neg;
+        other.a_be = self.a_be;
+        other.a_neg_be = self.a_neg_be;
+        other.a_neg_sub = self.a_neg_sub;
+        other.s = self.s;
+        other.s_ni = self.s_ni;
+        other.k = self.k;
+        other.s_be = self.s_be;
+        other.s_ni_be = self.s_ni_be;
+        other.k_be = self.k_be;
+        other.chord_valid = false;
+        other.matrices_dirty = false;
     }
 
     /// Current resistance of runtime resistor `r_ldr` (ohms).
@@ -4311,6 +4336,10 @@ fn invert_n(a: &[[f64; N]; N]) -> Option<[[f64; N]; N]> {
         }
     }
 
+    if lu.iter().flatten().all(|x| x.is_finite()) {
+        return Some(solve_identity_columns(&lu, &perm));
+    }
+
     let mut result = [[0.0f64; N]; N];
     for col in 0..N {
         let mut b = [0.0f64; N];
@@ -4346,6 +4375,133 @@ fn invert_n(a: &[[f64; N]; N]) -> Option<[[f64; N]; N]> {
     }
 
     Some(result)
+}
+
+/// All identity columns of `invert_n`'s substitution at once, row-major so
+/// the independent columns vectorize instead of serializing on divisions.
+///
+/// Per column this performs the same operations in the same order as the
+/// scalar loop. Its extra forward terms multiply finite `lu` entries by the
+/// +0.0 above the column's unit entry; subtracting that ±0.0 from a partial
+/// sum that started at +0.0 or 1.0 cannot change its bits.
+#[inline(always)]
+fn solve_identity_columns(lu: &[[f64; N]; N], perm: &[usize; N]) -> [[f64; N]; N] {
+    let mut x = [[0.0f64; N]; N];
+    for i in 0..N {
+        x[i][perm[i]] = 1.0;
+    }
+    for i in 1..N {
+        for j in 0..i {
+            let l = lu[i][j];
+            let (done, rest) = x.split_at_mut(i);
+            let (src, dst) = (&done[j], &mut rest[0]);
+            for col in 0..N {
+                dst[col] -= l * src[col];
+            }
+        }
+    }
+    for i in (0..N).rev() {
+        for j in (i + 1)..N {
+            let u = lu[i][j];
+            let (head, tail) = x.split_at_mut(j);
+            let (dst, src) = (&mut head[i], &tail[0]);
+            for col in 0..N {
+                dst[col] -= u * src[col];
+            }
+        }
+        let pivot = lu[i][i];
+        for col in 0..N {
+            x[i][col] /= pivot;
+        }
+    }
+    x
+}
+
+#[inline(always)]
+fn same_bits<const R: usize, const C: usize>(a: &[[f64; C]; R], b: &[[f64; C]; R]) -> bool {
+    a.iter()
+        .flatten()
+        .zip(b.iter().flatten())
+        .all(|(x, y)| x.to_bits() == y.to_bits())
+}
+
+/// Nonzero rows of each `N_I` column and nonzero columns of each `N_V` row.
+const fn incidence_nonzeros<const R: usize, const C: usize>(
+    matrix: &[[f64; C]; R],
+    by_column: bool,
+) -> ([[usize; N]; N], [usize; N]) {
+    let mut index = [[0usize; N]; N];
+    let mut count = [0usize; N];
+    let mut r = 0;
+    while r < R {
+        let mut c = 0;
+        while c < C {
+            if matrix[r][c] != 0.0 {
+                let (outer, inner) = if by_column { (c, r) } else { (r, c) };
+                index[outer][count[outer]] = inner;
+                count[outer] += 1;
+            }
+            c += 1;
+        }
+        r += 1;
+    }
+    (index, count)
+}
+
+const N_I_NONZERO: ([[usize; N]; N], [usize; N]) = incidence_nonzeros(&N_I, true);
+const N_V_NONZERO: ([[usize; N]; N], [usize; N]) = incidence_nonzeros(&N_V, false);
+
+/// S_NI = S * N_i and K = N_v * S_NI.
+///
+/// The sums start at +0.0 and so never hold -0.0; a skipped term is a
+/// finite factor times an exact zero incidence entry, i.e. ±0.0, and adding
+/// it cannot change the sum. Non-finite inputs take the dense loops.
+#[inline(always)]
+fn schur_products(s: &[[f64; N]; N], s_ni: &mut [[f64; M]; N], k: &mut [[f64; M]; M]) {
+    if s.iter().flatten().all(|x| x.is_finite()) {
+        let (rows, counts) = &N_I_NONZERO;
+        for i in 0..N {
+            for j in 0..M {
+                let mut sum = 0.0;
+                for &a in &rows[j][..counts[j]] {
+                    sum += s[i][a] * N_I[a][j];
+                }
+                s_ni[i][j] = sum;
+            }
+        }
+    } else {
+        for i in 0..N {
+            for j in 0..M {
+                let mut sum = 0.0;
+                for a in 0..N {
+                    sum += s[i][a] * N_I[a][j];
+                }
+                s_ni[i][j] = sum;
+            }
+        }
+    }
+    if s_ni.iter().flatten().all(|x| x.is_finite()) {
+        let (cols, counts) = &N_V_NONZERO;
+        for i in 0..M {
+            for j in 0..M {
+                let mut sum = 0.0;
+                for &a in &cols[i][..counts[i]] {
+                    sum += N_V[i][a] * s_ni[a][j];
+                }
+                k[i][j] = sum;
+            }
+        }
+    } else {
+        for i in 0..M {
+            for j in 0..M {
+                let mut sum = 0.0;
+                for a in 0..N {
+                    sum += N_V[i][a] * s_ni[a][j];
+                }
+                k[i][j] = sum;
+            }
+        }
+    }
 }
 
 // =============================================================================

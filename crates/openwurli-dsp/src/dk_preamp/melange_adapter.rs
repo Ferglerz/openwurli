@@ -75,6 +75,9 @@ impl DkPreamp {
 
 impl PreampModel for DkPreamp {
     fn process_sample(&mut self, input: f64) -> f64 {
+        // Both states receive the same LDR updates, so their pending
+        // rebuilds are normally identical and need one inversion.
+        self.main.rebuild_pending_shared(&mut self.shadow);
         let main_out = gen_preamp::process_sample(input, &mut self.main)[0];
         let pump = gen_preamp::process_sample(0.0, &mut self.shadow)[0];
         let result = main_out - pump;
