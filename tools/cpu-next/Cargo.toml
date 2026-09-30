@@ -1,0 +1,37 @@
+[package]
+name = "cpu-next"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[features]
+default = ["engine-heavy"]
+engine-heavy = ["openwurli-dsp/melange-preamp", "cpu-next-reference/melange-preamp"]
+runtime-modes = ["openwurli-dsp/runtime-models"]
+engine-fast = ["openwurli-dsp/legacy-power-amp", "cpu-next-reference/legacy-power-amp"]
+cpu-study-heavy-matrices = ["openwurli-dsp/cpu-study-heavy-matrices"]
+cpu-study-preamp-reuse = ["openwurli-dsp/cpu-study-preamp-reuse"]
+cpu-study-tremolo-zero = ["openwurli-dsp/cpu-study-tremolo-zero"]
+cpu-study-damper-recurrence = ["openwurli-dsp/cpu-study-damper-recurrence"]
+cpu-study-amp-transfer = ["openwurli-dsp/cpu-study-amp-transfer"]
+
+[dependencies]
+openwurli-dsp = { path = "../../crates/openwurli-dsp", default-features = false }
+cpu-next-reference = { path = "reference", default-features = false }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hound = "3.5"
+
+[workspace]
+members = ["reference"]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/hal0zer0/openwurli"
+authors = ["hal0zer0"]
+
+[workspace.dependencies]
+melange-primitives = { git = "https://github.com/hal0zer0/melange", rev = "7ecb36c" }

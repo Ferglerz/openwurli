@@ -1,0 +1,31 @@
+{
+  "report_sha256": "d0ce148c4c44ba1a7fa199ab448a5123018956deb6e68e71d00dc75b1f324012",
+  "files": {
+    "Cargo.toml": {
+      "sha256": "0ec080e17c441fc74eeabebf05256d8e65443d43c5334957b39271cbb25a5f46",
+      "git_blob": "d8d3615742241d846c955d6842a27ba8136214b7",
+      "matches_run_build_hash": true
+    },
+    "Cargo.lock": {
+      "sha256": "9b37674479f389545118957e11b40fb5b84c10d4538a9ba782411b4050a2542b",
+      "git_blob": "1e64fdc143000f8086feb5420b431ca3b7f11530",
+      "matches_run_build_hash": true
+    },
+    "build.rs": {
+      "sha256": "37c98a832070477f7ce07de967cc539fd674b7a388fbcbd141523ba2e4db0828",
+      "git_blob": "9efe1837059569c842efa00f3e7a82c55b2713f3",
+      "matches_run_build_hash": true
+    },
+    "src/main.rs": {
+      "sha256": "04cab6b98bfd1d73ff9a381d83834114269ff353366b695ace8647d8fe4dbd93",
+      "git_blob": "fe86d935f50c3c5e63dc80a75b768f4d11e2e755",
+      "matches_run_build_hash": true
+    },
+    "README.md": {
+      "sha256": "7ffa559643158c13797a232699f3827ffa97ca261ea0fb72ef379873a160bf2f",
+      "git_blob": "1f29d8fba7aaaf6af6d781d553fd30f43e782297",
+      "matches_run_build_hash": null
+    }
+  },
+  "note": "README includes post-run findings; all files represented in the run build provenance match exactly."
+}

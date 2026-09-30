@@ -1,0 +1,4 @@
+# Disposable immutable reference generated from Git; never commit engine copies.
+/reference/
+/target/
+/__pycache__/

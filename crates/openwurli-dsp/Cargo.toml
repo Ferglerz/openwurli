@@ -19,6 +19,13 @@ legacy-tremolo = []
 legacy-power-amp = []
 # Numerical comparison candidate: retains canonical analytical functions.
 experimental-circuit-lut = []
+# Temporary independent candidates for the second measured CPU pass.
+cpu-study-preamp-reuse = []
+cpu-study-tremolo-zero = []
+cpu-study-damper-recurrence = []
+cpu-study-amp-transfer = []
+cpu-study-heavy-matrices = []
+runtime-models = []
 
 [lints.rust]
 unexpected_cfgs = { level = "allow", check-cfg = ['cfg(melange_precise_exp)'] }

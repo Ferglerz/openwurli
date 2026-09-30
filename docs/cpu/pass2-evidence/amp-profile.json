@@ -1,0 +1,115 @@
+{
+  "baseline": "fd4f603dd8deef7a57d4449826f2c9d5dd53757e",
+  "block": 256,
+  "cases": [
+    {
+      "amp_input_max": 0.014132896238336752,
+      "amp_input_min": -0.012167633512116756,
+      "amp_inputs": 48000,
+      "amp_median_ns": 1039291,
+      "amp_replay_ns": [
+        1091334,
+        1047167,
+        1188417,
+        992709,
+        995209,
+        1016542,
+        1283042,
+        1114500,
+        1016167,
+        1039291,
+        992000
+      ],
+      "amp_share_percent": 3.79834095889259,
+      "engine_median_ns": 27361709,
+      "engine_ns": [
+        29708041,
+        27361709,
+        26946458,
+        26756834,
+        30369708,
+        26376167,
+        49496417,
+        33527083,
+        28039458,
+        27046708,
+        26298291
+      ],
+      "voices": 1
+    },
+    {
+      "amp_input_max": 0.041300491018259125,
+      "amp_input_min": -0.04246983051588312,
+      "amp_inputs": 48000,
+      "amp_median_ns": 1135167,
+      "amp_replay_ns": [
+        1144583,
+        1145917,
+        1124541,
+        1259792,
+        1122250,
+        1111458,
+        1146042,
+        1102958,
+        1135167,
+        1389625,
+        1104416
+      ],
+      "amp_share_percent": 3.7638995530836175,
+      "engine_median_ns": 30159333,
+      "engine_ns": [
+        30281500,
+        30442875,
+        30152333,
+        29812458,
+        29740667,
+        30446625,
+        30159333,
+        29817584,
+        30245375,
+        29839292,
+        30262334
+      ],
+      "voices": 6
+    },
+    {
+      "amp_input_max": 0.06528202991570259,
+      "amp_input_min": -0.061332619233327675,
+      "amp_inputs": 48000,
+      "amp_median_ns": 1255708,
+      "amp_replay_ns": [
+        1740500,
+        1264417,
+        1255708,
+        1278667,
+        1218750,
+        1220000,
+        1276916,
+        1370417,
+        1234250,
+        1245708,
+        1250375
+      ],
+      "amp_share_percent": 3.9005268550976395,
+      "engine_median_ns": 32193292,
+      "engine_ns": [
+        32193292,
+        32852209,
+        32125125,
+        32269083,
+        32552916,
+        32870208,
+        31987041,
+        32608666,
+        31425167,
+        31388166,
+        31267416
+      ],
+      "voices": 12
+    }
+  ],
+  "method": "unmodified native engine vs independent amp replay of real captured inputs; capture crate never timed; diagnostic estimate excludes stage scheduling/context and includes loop black_box overhead",
+  "repeats": 11,
+  "sample_rate": 48000.0,
+  "samples": 24000
+}

@@ -1,0 +1,19 @@
+[package]
+name = "cpu-amp-profile"
+version = "0.1.0"
+edition = "2024"
+publish = false
+[dependencies]
+reference = { package = "cpu-profile-reference", path = "reference" }
+capture = { package = "cpu-profile-capture", path = "capture" }
+serde_json = "1"
+[workspace]
+members = ["reference", "capture"]
+resolver = "2"
+[workspace.package]
+edition = "2024"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/Ferglerz/openwurli"
+authors = ["hal0zer0"]
+[workspace.dependencies]
+melange-primitives = { git = "https://github.com/hal0zer0/melange", rev = "7ecb36c" }

@@ -253,6 +253,13 @@ impl Tremolo {
     pub fn set_depth(&mut self, depth: f64) {
         let depth = depth.clamp(0.0, 1.0);
         if depth != self.depth {
+            #[cfg(feature = "cpu-study-tremolo-zero")]
+            if self.depth == 0.0 && depth > 0.0 {
+                // At zero depth the LDR branch was inaudible and its mapping
+                // could be skipped. Refresh before exposing it, including an
+                // immediate current_resistance() query without another sample.
+                self.update_ldr_resistance();
+            }
             self.depth = depth;
             (self.divider_top, self.divider_lower) = depth_divider(depth);
         }
@@ -288,7 +295,19 @@ impl Tremolo {
         };
         self.ldr_envelope = led_drive + coeff * (self.ldr_envelope - led_drive);
 
-        // Step 3: CdS power-law resistance
+        // Step 3: at depth zero the lower divider leg is grounded, so the
+        // instantaneous LDR resistance cannot affect the returned impedance.
+        // Oscillator and envelope above continue to advance without interruption.
+        if !cfg!(feature = "cpu-study-tremolo-zero") || self.depth != 0.0 {
+            self.update_ldr_resistance();
+        }
+
+        // Step 4: depth divider → shunt impedance seen by fb_junction
+        self.shunt_impedance()
+    }
+
+    #[inline]
+    fn update_ldr_resistance(&mut self) {
         let drive = self.ldr_envelope.clamp(0.0, 1.0);
         if drive < 1e-6 {
             self.r_ldr = self.r_ldr_max;
@@ -298,9 +317,6 @@ impl Tremolo {
             self.r_ldr =
                 ldr_resistance_analytical(drive, self.ln_r_max, self.ln_min_minus_max, self.gamma);
         }
-
-        // Step 4: depth divider → shunt impedance seen by fb_junction
-        self.shunt_impedance()
     }
 
     /// Shunt impedance from fb_junction to ground through the vibrato depth
@@ -390,6 +406,46 @@ impl Tremolo {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn zero_depth_skip_preserves_timing_reset_and_immediate_resistance() {
+        for sample_rate in [44_100.0, 96_000.0] {
+            let mut candidate = Tremolo::new(0.0, sample_rate);
+            let mut reference = Tremolo::new(0.0, sample_rate);
+            candidate.set_response_multiplier(0.5);
+            reference.set_response_multiplier(0.5);
+            for i in 0..2048 {
+                if i == 1024 {
+                    candidate.reset();
+                    reference.reset();
+                }
+                if i % 128 == 0 {
+                    let depth = [0.0, 1.0, 0.0, 1e-12, 0.25, 0.0, 0.75, 0.0][i / 128 % 8];
+                    candidate.set_depth(depth);
+                    reference.set_depth(depth);
+                    assert_eq!(
+                        candidate.current_resistance().to_bits(),
+                        reference.current_resistance().to_bits(),
+                        "immediate resistance at sample {i}, rate {sample_rate}"
+                    );
+                }
+                let actual = candidate.process();
+                reference.process();
+                // Eager native mapping models the original implementation,
+                // even while the candidate deliberately leaves its cache stale.
+                reference.update_ldr_resistance();
+                assert_eq!(
+                    actual.to_bits(),
+                    reference.current_resistance().to_bits(),
+                    "processed resistance at sample {i}, rate {sample_rate}"
+                );
+                assert_eq!(
+                    candidate.ldr_envelope.to_bits(),
+                    reference.ldr_envelope.to_bits()
+                );
+            }
+        }
+    }
 
     #[test]
     fn response_multiplier_changes_ldr_timing_without_changing_depth() {

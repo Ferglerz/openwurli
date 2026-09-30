@@ -600,7 +600,7 @@ fn compute_k(s: &MatN, ni: &[[(usize, f64); 2]; 2]) -> [[f64; 2]; 2] {
 ///
 #[inline(always)]
 #[allow(clippy::too_many_arguments)]
-fn dk_step(
+fn dk_step<const REUSE_FINAL_CURRENTS: bool>(
     a_neg_base: &MatN,
     two_w: &VecN,
     s_base: &MatN,
@@ -692,6 +692,7 @@ fn dk_step(
     let kb = kernel.base;
 
     let mut v_nl = state.v_nl;
+    let mut final_currents = None;
 
     for _iter in 0..6 {
         let (ic0, ib0, gc0, gb0) = bjt(v_nl[0]);
@@ -701,6 +702,9 @@ fn dk_step(
         let f1 = v_nl[1] - p[1] - kc[1][0] * ic0 - kc[1][1] * ic1 - kb[1][0] * ib0 - kb[1][1] * ib1;
 
         if f0.abs() < 1e-9 && f1.abs() < 1e-9 {
+            if REUSE_FINAL_CURRENTS {
+                final_currents = Some(([ic0, ic1], [ib0, ib1]));
+            }
             break;
         }
 
@@ -711,6 +715,9 @@ fn dk_step(
 
         let det = j00 * j11 - j01 * j10;
         if det.abs() < 1e-30 {
+            if REUSE_FINAL_CURRENTS {
+                final_currents = Some(([ic0, ic1], [ib0, ib1]));
+            }
             break;
         }
         let inv_det = 1.0 / det;
@@ -719,11 +726,15 @@ fn dk_step(
         v_nl[1] -= inv_det * (j00 * f1 - j10 * f0);
     }
 
-    // 6. Final NL currents at the converged Vbe
-    let (ic0, ib0, _, _) = bjt(v_nl[0]);
-    let (ic1, ib1, _, _) = bjt(v_nl[1]);
-    let ic_new = [ic0, ic1];
-    let ib_new = [ib0, ib1];
+    // 6. Final NL currents at the converged Vbe. On either early exit above,
+    // these exact currents were just evaluated and v_nl has not changed. If all
+    // six iterations update v_nl, evaluate again at that final voltage as before.
+    // The false specialization retains the original path for paired proof.
+    let (ic_new, ib_new) = final_currents.unwrap_or_else(|| {
+        let (ic0, ib0, _, _) = bjt(v_nl[0]);
+        let (ic1, ib1, _, _) = bjt(v_nl[1]);
+        ([ic0, ic1], [ib0, ib1])
+    });
 
     // 7. Node voltage update
     let sfb_dot = sfb_nic[0] * ic_new[0]
@@ -756,7 +767,7 @@ impl PreampModel for DkPreamp {
         // Run main solver with audio input.
         // Field-level borrow splitting: config fields (&self.xxx) are immutable,
         // state field (&mut self.main) is mutable — different fields, no conflict.
-        let main_out = dk_step(
+        let main_out = dk_step::<{ cfg!(feature = "cpu-study-preamp-reuse") }>(
             &self.a_neg_base,
             &self.two_w,
             &self.s_base,
@@ -1138,6 +1149,66 @@ mod tests {
         }
 
         peak / amplitude
+    }
+
+    #[test]
+    fn final_current_reuse_matches_original_solver_trajectory() {
+        fn step<const REUSE: bool>(p: &mut DkPreamp, input: f64) -> f64 {
+            let result = dk_step::<REUSE>(
+                &p.a_neg_base,
+                &p.two_w,
+                &p.s_base,
+                &p.s_nic,
+                &p.s_nib,
+                &p.s_fb_col,
+                p.s_fb_fb,
+                p.g_ldr,
+                p.g_ldr_prev,
+                &p.k_c,
+                &p.k_b,
+                &p.nv_sfb,
+                &p.sfb_nic,
+                &p.sfb_nib,
+                p.g_cin,
+                p.gc_1pc,
+                p.c_cin,
+                &mut p.main,
+                input,
+            );
+            p.g_ldr_prev = p.g_ldr;
+            result
+        }
+        for sample_rate in [44_100.0, 88_200.0, 96_000.0] {
+            let mut reference = DkPreamp::new(sample_rate);
+            let mut candidate = DkPreamp::new(sample_rate);
+            for i in 0..4096 {
+                if i == 2048 {
+                    reference.reset();
+                    candidate.reset();
+                }
+                let resistance = [1_000_000.0, 19_000.0, 50_000.0, 1_000.0][i / 1024];
+                reference.set_ldr_resistance(resistance);
+                candidate.set_ldr_resistance(resistance);
+                // Include settled silence, small-signal audio and overdrive to
+                // exercise both convergence exits and exhausted NR iterations.
+                let amplitude = [0.0, 0.001, 0.5, 5.0][i / 1024];
+                let input = amplitude * (i as f64 * 0.03125).sin();
+                let a = step::<false>(&mut reference, input);
+                let b = step::<true>(&mut candidate, input);
+                assert_eq!(
+                    a.to_bits(),
+                    b.to_bits(),
+                    "output sample {i} at {sample_rate}"
+                );
+                for (x, y) in reference.main.v.iter().zip(candidate.main.v.iter()) {
+                    assert_eq!(
+                        x.to_bits(),
+                        y.to_bits(),
+                        "state sample {i} at {sample_rate}"
+                    );
+                }
+            }
+        }
     }
 
     #[test]

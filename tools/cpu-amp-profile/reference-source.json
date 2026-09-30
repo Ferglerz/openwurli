@@ -1,0 +1,31 @@
+{
+  "revision": "fd4f603dd8deef7a57d4449826f2c9d5dd53757e",
+  "sha256": {
+    "crates/openwurli-dsp/Cargo.toml": "a6b799a8f59615ab52e8a030f1854df1f634275112503439e56b1b882fbebd28",
+    "crates/openwurli-dsp/src/alias_audit.rs": "2e40071af6189c9a19cab5ecdeee60978a9ede247d8807fbca7d47f4fb702ae9",
+    "crates/openwurli-dsp/src/circuit_lut.rs": "6e40611426c21e944c8e991783a525294a2a0cc63d153ca20a26c996f62f4f23",
+    "crates/openwurli-dsp/src/circuit_math.rs": "6deba69cf363786989f0839b217af0ed0061430b439cff253e10303b1cd2e91e",
+    "crates/openwurli-dsp/src/dk_preamp/melange_adapter.rs": "2bbdebf8f8acdeaf1dc63af7b79eb94d6cc78d3d679249ed12eb0839bf41ae1b",
+    "crates/openwurli-dsp/src/dk_preamp/mod.rs": "0a82a7b845f74cbd80cee69bf563b19f96522b239d85a995aedf60b6a490242c",
+    "crates/openwurli-dsp/src/dk_preamp_legacy.rs": "e0e0e004a4acf64fd8e868a5b96c4eac5448e670bedab2697f021253fd23a6f0",
+    "crates/openwurli-dsp/src/engine.rs": "d7d7022d339c13f690b9d6d00aaaed106854f7a6c86b1f66d543c885f2bdaa4f",
+    "crates/openwurli-dsp/src/filters.rs": "be51c41c2626b6770ebde5140a2c443449f34ef52e0456c7e6f262519d1d96c3",
+    "crates/openwurli-dsp/src/gen_power_amp.rs": "df09f22a24c0d2e4d77241bf8ef2fc8dce96680e9e0fae44eb062dff19fabf94",
+    "crates/openwurli-dsp/src/gen_preamp.rs": "7238f8d65feea83cc9ea6ce39cc55224c98c18a0ddc17539d9be97eb75edcd8c",
+    "crates/openwurli-dsp/src/gen_tremolo.rs": "6437be47f933ecb8a9104cbfd226c291dfdf3b84cd3ca6855034f5a64137173e",
+    "crates/openwurli-dsp/src/hammer.rs": "d8dae815ab1a3dc5f722f57a2b5db41dec60a5fecff45a5aca0366afa6909311",
+    "crates/openwurli-dsp/src/lib.rs": "abe654c092de1faa53aeb17001aa48b4413d280b32e52b5740f0957b0195eb73",
+    "crates/openwurli-dsp/src/mlp_correction.rs": "ec900633549222c2bfc9c74b13c36cb9489c58be62f8ba11bb519daf28b6cd7a",
+    "crates/openwurli-dsp/src/mlp_weights.rs": "b8e1ff729f1f1eb3e1689f92c5ebe67e39b520a10aa90bfa2fc16b41ff1d963e",
+    "crates/openwurli-dsp/src/oversampler.rs": "69f39189c6642fa06f2c245b6703b6eaf5a4971e95e2cbfbe2fa063664486100",
+    "crates/openwurli-dsp/src/pickup.rs": "d19ab68d098d3f77e11a091b0b017c30436b1b5552fdbc156d942145f6d98c66",
+    "crates/openwurli-dsp/src/power_amp.rs": "2a8dd48ed96af80032aaf3ae3b9a500b2e9ac09847ff192276e7c42ecd12448a",
+    "crates/openwurli-dsp/src/preamp.rs": "c23a4a45ebb6f18dae17ba57fbd5ae1f210bb80dc86d611f09ae05a618fe2417",
+    "crates/openwurli-dsp/src/reed.rs": "54c5b7da3c69ce6edc1261254b2f2dfd5357eb42224b9fb339755aedfc83afdd",
+    "crates/openwurli-dsp/src/speaker.rs": "66668c75290037bc10baeac8a47f348bc6d2dd74f16a99fca4b215b000275147",
+    "crates/openwurli-dsp/src/tables.rs": "c4da8cad590b765602c89c3d876a2438443097c07982c100115cbe1a96ff267a",
+    "crates/openwurli-dsp/src/tremolo.rs": "79c5f3187577e1788228805ec5b3c5d7d46319ea875a04a8367c4f09d610fd76",
+    "crates/openwurli-dsp/src/variation.rs": "32ccf0375672538570e6e8e5f141376c41b82a002c631c3aeb370bd067434565",
+    "crates/openwurli-dsp/src/voice.rs": "619d2bf5c6a739318a07094b38b98dee47818b2ffa9439341b2a0439e74eece7"
+  }
+}

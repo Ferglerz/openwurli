@@ -1,0 +1,24 @@
+[package]
+name = "cpu-mode-switch"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+
+[features]
+default = []
+cpu-study-heavy-matrices = ["openwurli-dsp/cpu-study-heavy-matrices"]
+cpu-study-preamp-reuse = ["openwurli-dsp/cpu-study-preamp-reuse"]
+cpu-study-tremolo-zero = ["openwurli-dsp/cpu-study-tremolo-zero"]
+cpu-study-damper-recurrence = ["openwurli-dsp/cpu-study-damper-recurrence"]
+
+[dependencies]
+openwurli-dsp = { path = "../../crates/openwurli-dsp", features = ["runtime-models"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hound = "3.5"
+
+[build-dependencies]
+serde_json = "1"
+
+[workspace]

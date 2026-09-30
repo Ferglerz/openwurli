@@ -7,7 +7,7 @@ members = [
     "xtask",
 ]
 resolver = "2"
-exclude = ["tools/cpu-ab"]
+exclude = ["tools/cpu-ab", "tools/cpu-next", "tools/cpu-amp-profile"]
 
 [workspace.dependencies]
 melange-primitives = { git = "https://github.com/hal0zer0/melange", rev = "7ecb36c" }

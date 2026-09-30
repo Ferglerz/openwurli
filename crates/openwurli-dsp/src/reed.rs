@@ -72,6 +72,15 @@ pub struct ModalReed {
     damper_ramp_samples: f64,
     damper_release_count: f64,
     damper_ramp_done: bool,
+    #[cfg(feature = "cpu-study-damper-recurrence")]
+    damper_ramp_step: [f64; NUM_MODES],
+    #[cfg(feature = "cpu-study-damper-recurrence")]
+    damper_ramp_multiplier: [f64; NUM_MODES],
+    #[cfg(feature = "cpu-study-damper-recurrence")]
+    damper_anchor_remaining: u8,
+    // Compare against the original expression without a second reed model.
+    #[cfg(all(test, feature = "cpu-study-damper-recurrence"))]
+    damper_recurrence_enabled: bool,
     // Jitter PRNG and coefficients
     jitter_state: u32,
     jitter_revert: f64,
@@ -88,6 +97,14 @@ fn store2(arr: &mut [f64; NUM_MODES], i: usize, v: f64x2) {
     let [a, b] = v.to_array();
     arr[i] = a;
     arr[i + 1] = b;
+}
+
+/// Original progressive damper multiplier, retained permanently as the
+/// analytical reference. Preserve multiply, divide, negate, exp order.
+#[inline]
+pub fn damper_ramp_multiplier_analytical(rate: f64, count: f64, ramp: f64) -> f64 {
+    let inst_rate = rate * count / ramp;
+    (-inst_rate).exp()
 }
 
 /// Scalar leftover lane (mode 6). Same add-then-rotate-then-decay order
@@ -212,6 +229,14 @@ impl ModalReed {
             damper_ramp_samples: 0.0,
             damper_release_count: 0.0,
             damper_ramp_done: false,
+            #[cfg(feature = "cpu-study-damper-recurrence")]
+            damper_ramp_step: [1.0; NUM_MODES],
+            #[cfg(feature = "cpu-study-damper-recurrence")]
+            damper_ramp_multiplier: [1.0; NUM_MODES],
+            #[cfg(feature = "cpu-study-damper-recurrence")]
+            damper_anchor_remaining: 0,
+            #[cfg(all(test, feature = "cpu-study-damper-recurrence"))]
+            damper_recurrence_enabled: true,
             jitter_state,
             jitter_revert,
             jitter_diffusion,
@@ -250,6 +275,20 @@ impl ModalReed {
         self.damper_active = true;
         self.damper_release_count = 0.0;
         self.damper_ramp_done = false;
+        #[cfg(feature = "cpu-study-damper-recurrence")]
+        {
+            // A repeated note-off starts a fresh ramp without resetting the
+            // existing envelope. Derive the step from the native expression.
+            for i in 0..NUM_MODES {
+                self.damper_ramp_step[i] = damper_ramp_multiplier_analytical(
+                    self.damper_rate[i],
+                    1.0,
+                    self.damper_ramp_samples,
+                );
+            }
+            self.damper_ramp_multiplier = [1.0; NUM_MODES];
+            self.damper_anchor_remaining = 0;
+        }
     }
 
     /// Render samples into the output buffer (additive, does NOT clear buffer).
@@ -269,10 +308,48 @@ impl ModalReed {
                     if t > ramp {
                         self.damper_ramp_done = true;
                     } else {
-                        // During ramp: apply instantaneous rate (still needs exp per mode)
+                        #[cfg(feature = "cpu-study-damper-recurrence")]
+                        {
+                            #[cfg(test)]
+                            let use_recurrence = self.damper_recurrence_enabled;
+                            #[cfg(not(test))]
+                            let use_recurrence = true;
+                            if use_recurrence {
+                                // Anchor t=1,33,65,... from the unchanged formula.
+                                // Between anchors exp(a*(t+1)) = exp(a*t)*exp(a),
+                                // up to floating-point rounding; this is opt-in.
+                                for i in 0..NUM_MODES {
+                                    if self.damper_anchor_remaining == 0 {
+                                        self.damper_ramp_multiplier[i] =
+                                            damper_ramp_multiplier_analytical(
+                                                self.damper_rate[i],
+                                                t,
+                                                ramp,
+                                            );
+                                    } else {
+                                        self.damper_ramp_multiplier[i] *= self.damper_ramp_step[i];
+                                    }
+                                    self.envelope[i] *= self.damper_ramp_multiplier[i];
+                                }
+                                if self.damper_anchor_remaining == 0 {
+                                    self.damper_anchor_remaining = 31;
+                                } else {
+                                    self.damper_anchor_remaining -= 1;
+                                }
+                            } else {
+                                for i in 0..NUM_MODES {
+                                    self.envelope[i] *= damper_ramp_multiplier_analytical(
+                                        self.damper_rate[i],
+                                        t,
+                                        ramp,
+                                    );
+                                }
+                            }
+                        }
+                        #[cfg(not(feature = "cpu-study-damper-recurrence"))]
                         for i in 0..NUM_MODES {
-                            let inst_rate = self.damper_rate[i] * t / ramp;
-                            self.envelope[i] *= (-inst_rate).exp();
+                            self.envelope[i] *=
+                                damper_ramp_multiplier_analytical(self.damper_rate[i], t, ramp);
                         }
                     }
                 }
@@ -387,6 +464,106 @@ impl ModalReed {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(feature = "cpu-study-damper-recurrence")]
+    #[test]
+    fn test_damper_recurrence_against_analytical_render() {
+        let mut max_peak = 0.0f64;
+        let mut max_relative_rms = 0.0f64;
+        let mut max_window_relative_rms = 0.0f64;
+        let mut compared = 0usize;
+        let blocks = [1, 15, 16, 17, 31, 32, 33, 127, 257, 1023];
+        for sr in [44_100.0, 48_000.0, 96_000.0, 192_000.0] {
+            for note in 33..=96 {
+                let params = crate::tables::note_params(note);
+                for velocity in [0.001, 0.7, 1.0] {
+                    let make = || {
+                        ModalReed::new(
+                            params.fundamental_hz,
+                            &params.mode_ratios,
+                            &params.mode_amplitudes,
+                            &params.mode_decay_rates,
+                            0.002,
+                            velocity,
+                            sr,
+                            42,
+                        )
+                    };
+                    let mut native = make();
+                    native.damper_recurrence_enabled = false;
+                    let mut candidate = make();
+                    let mut reference = Vec::new();
+                    let mut optimized = Vec::new();
+                    let mut block_index = 0;
+                    // Repeat note-off during the ramp and again after it ends.
+                    for (phase, seconds) in [0.008, 0.005, 0.065, 0.065].into_iter().enumerate() {
+                        if phase > 0 {
+                            native.start_damper(note, sr);
+                            candidate.start_damper(note, sr);
+                        }
+                        let mut remaining = (seconds * sr) as usize;
+                        native.render(&mut []);
+                        candidate.render(&mut []);
+                        while remaining > 0 {
+                            let n = blocks[block_index % blocks.len()].min(remaining);
+                            let mut a = vec![0.0; n];
+                            let mut b = vec![0.0; n];
+                            native.render(&mut a);
+                            candidate.render(&mut b);
+                            if phase == 0 || note >= 92 {
+                                assert!(
+                                    a.iter().zip(&b).all(|(a, b)| a.to_bits() == b.to_bits()),
+                                    "undamped audio changed: note={note}, sr={sr}"
+                                );
+                            }
+                            reference.extend(a);
+                            optimized.extend(b);
+                            remaining -= n;
+                            block_index += 1;
+                        }
+                        assert_eq!(native.damper_release_count, candidate.damper_release_count);
+                        assert_eq!(native.damper_ramp_done, candidate.damper_ramp_done);
+                    }
+                    let relative = |a: &[f64], b: &[f64]| {
+                        let signal = a.iter().map(|x| x * x).sum::<f64>();
+                        let error = a.iter().zip(b).map(|(x, y)| (x - y) * (x - y)).sum::<f64>();
+                        if signal == 0.0 {
+                            assert_eq!(error, 0.0);
+                            0.0
+                        } else {
+                            (error / signal).sqrt()
+                        }
+                    };
+                    max_relative_rms = max_relative_rms.max(relative(&reference, &optimized));
+                    for (a, b) in reference
+                        .chunks((sr * 0.020) as usize)
+                        .zip(optimized.chunks((sr * 0.020) as usize))
+                    {
+                        max_window_relative_rms = max_window_relative_rms.max(relative(a, b));
+                    }
+                    for (a, b) in reference.iter().zip(&optimized) {
+                        assert!(a.is_finite() && b.is_finite());
+                        max_peak = max_peak.max((a - b).abs());
+                    }
+                    compared += reference.len();
+                }
+            }
+        }
+        eprintln!(
+            "damper recurrence/native: samples={compared}, peak={max_peak:e}, relative_rms={max_relative_rms:e}, worst_20ms_relative_rms={max_window_relative_rms:e}"
+        );
+        // Reed-only gates deliberately much tighter than the full-chain -60dB
+        // gates. Circuit amplification and NR convergence need separate proof.
+        assert!(max_peak < 1e-10, "peak reed difference {max_peak:e}");
+        assert!(
+            max_relative_rms < 1e-10,
+            "relative reed RMS {max_relative_rms:e}"
+        );
+        assert!(
+            max_window_relative_rms < 1e-10,
+            "20ms reed RMS {max_window_relative_rms:e}"
+        );
+    }
 
     #[test]
     fn test_single_mode_sine() {
@@ -610,7 +787,8 @@ mod tests {
         let checksum = render_checksum_c4(8192);
         for block_size in [1, 15, 257, 1024] {
             assert_eq!(
-                render_checksum_c4(block_size), checksum,
+                render_checksum_c4(block_size),
+                checksum,
                 "reed output changed with host block size {block_size}"
             );
         }
