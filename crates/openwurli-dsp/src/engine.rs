@@ -693,8 +693,13 @@ impl WurliEngine {
 
     /// Note-on controls affect new notes only. Existing voices keep their
     /// excitation and decay parameters until released.
+    /// Decay time ranges from 0.5x to 20x; other character controls retain 0.5x–2x.
     pub fn set_reed_decay(&mut self, multiplier: f64) {
-        self.voice_character.reed_decay = bounded_multiplier(multiplier);
+        self.voice_character.reed_decay = if multiplier.is_finite() {
+            multiplier.clamp(0.5, 20.0)
+        } else {
+            1.0
+        };
     }
 
     pub fn set_hammer_hardness(&mut self, multiplier: f64) {
