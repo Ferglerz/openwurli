@@ -19,6 +19,8 @@ legacy-tremolo = []
 legacy-power-amp = []
 # Numerical comparison candidate: retains canonical analytical functions.
 experimental-circuit-lut = []
+# Compile both circuit models for saved runtime Fast/Heavy selection.
+runtime-models = []
 
 [lints.rust]
 unexpected_cfgs = { level = "allow", check-cfg = ['cfg(melange_precise_exp)'] }

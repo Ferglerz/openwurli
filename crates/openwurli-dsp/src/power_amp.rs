@@ -164,7 +164,7 @@ impl RailDynamics {
     }
 }
 
-#[cfg(feature = "legacy-power-amp")]
+#[cfg(any(feature = "legacy-power-amp", feature = "runtime-models"))]
 mod behavioral {
     //! Behavioral closed-loop negative feedback model.
 
@@ -305,7 +305,7 @@ mod behavioral {
 #[cfg(feature = "legacy-power-amp")]
 pub use behavioral::PowerAmp;
 
-#[cfg(not(feature = "legacy-power-amp"))]
+#[cfg(any(not(feature = "legacy-power-amp"), feature = "runtime-models"))]
 mod melange_adapter {
     //! Melange-generated 7-BJT Class AB circuit solver.
 
@@ -332,6 +332,97 @@ mod melange_adapter {
             state.set_sample_rate(sample_rate);
         }
         state
+    }
+
+    // Keep this exhaustive field list local to the adapter. A generated-state
+    // schema change must fail compilation here instead of silently retaining
+    // stale history. Box::clone_from reuses the cold-state allocation; derived
+    // CircuitState::clone_from would use its default whole-value clone instead.
+    macro_rules! circuit_state_fields {
+        ($operation:ident) => {
+            $operation!(
+                v_prev,
+                i_nl_prev,
+                i_nl_prev_prev,
+                dc_operating_point,
+                input_prev,
+                last_nr_iterations,
+                dc_block_x_prev,
+                dc_block_y_prev,
+                dc_block_r,
+                diag_peak_output,
+                diag_clamp_count,
+                diag_nr_max_iter_count,
+                diag_be_fallback_count,
+                diag_be_latch_count,
+                diag_active_set_pin_count,
+                diag_nan_reset_count,
+                diag_substep_count,
+                diag_refactor_count,
+                diag_voltage_damp_count,
+                chord_lu,
+                chord_dr,
+                chord_dc,
+                chord_perm,
+                chord_j_dev,
+                chord_valid,
+                chord_dense,
+                a,
+                a_neg,
+                a_be,
+                a_neg_be,
+                cold,
+                current_sample_rate,
+                device_0_is,
+                device_0_vt,
+                device_0_bf,
+                device_0_br,
+                device_1_is,
+                device_1_vt,
+                device_1_bf,
+                device_1_br,
+                device_2_is,
+                device_2_vt,
+                device_2_bf,
+                device_2_br,
+                device_3_is,
+                device_3_vt,
+                device_3_bf,
+                device_3_br,
+                device_4_is,
+                device_4_vt,
+                device_4_bf,
+                device_4_br,
+                device_5_is,
+                device_5_vt,
+                device_5_bf,
+                device_5_br,
+                device_6_is,
+                device_6_vt,
+                device_6_bf,
+                device_6_br,
+                v_rail_pos_offset,
+                v_rail_neg_offset,
+            );
+        };
+    }
+
+    fn restore_state_in_place(state: &mut CircuitState, sample_rate: f64) {
+        // Construction initializes this cache before any callback can reset.
+        let cached = SETTLED_STATE
+            .get()
+            .expect("PowerAmp constructed before reset");
+        macro_rules! restore_fields {
+            ($($field:ident),+ $(,)?) => {
+                let CircuitState { $($field),+ } = state;
+                $($field.clone_from(&cached.$field);)+
+            };
+        }
+        circuit_state_fields!(restore_fields);
+        // Preserve the original cached-clone then rate-conversion order.
+        if (sample_rate - gen_power_amp::SAMPLE_RATE).abs() > 0.5 {
+            state.set_sample_rate(sample_rate);
+        }
     }
 
     pub struct PowerAmp {
@@ -480,10 +571,183 @@ mod melange_adapter {
         }
 
         pub fn reset(&mut self) {
-            self.state = init_state(self.sample_rate);
+            restore_state_in_place(&mut self.state, self.sample_rate);
             self.rails.reset();
             // Do NOT clear last_good — the divergence-guard hold relies on it
             // surviving the reset. Only `new()` zeros it.
+        }
+    }
+
+    #[cfg(test)]
+    mod reset_tests {
+        use super::*;
+        use crate::gen_power_amp::CircuitStateCold;
+
+        trait StateBits {
+            fn poison(&mut self);
+            fn assert_same(&self, other: &Self);
+        }
+        impl StateBits for f64 {
+            fn poison(&mut self) {
+                *self = f64::from_bits(0x7ff8_0000_0000_002a);
+            }
+            fn assert_same(&self, other: &Self) {
+                assert_eq!(self.to_bits(), other.to_bits());
+            }
+        }
+        macro_rules! integer_bits {
+            ($($ty:ty),+) => { $(impl StateBits for $ty {
+                fn poison(&mut self) { *self = <$ty>::MAX; }
+                fn assert_same(&self, other: &Self) { assert_eq!(self, other); }
+            })+ };
+        }
+        integer_bits!(u32, u64, usize);
+        impl StateBits for bool {
+            fn poison(&mut self) {
+                *self = !*self;
+            }
+            fn assert_same(&self, other: &Self) {
+                assert_eq!(self, other);
+            }
+        }
+        impl<T: StateBits, const N: usize> StateBits for [T; N] {
+            fn poison(&mut self) {
+                for value in self {
+                    value.poison();
+                }
+            }
+            fn assert_same(&self, other: &Self) {
+                for (actual, expected) in self.iter().zip(other) {
+                    actual.assert_same(expected);
+                }
+            }
+        }
+        impl StateBits for Box<CircuitStateCold> {
+            fn poison(&mut self) {
+                let CircuitStateCold {
+                    s,
+                    k,
+                    s_ni,
+                    s_be,
+                    k_be,
+                    s_ni_be,
+                    s_sub,
+                    a_neg_sub,
+                    k_sub,
+                    s_ni_sub,
+                } = self.as_mut();
+                s.poison();
+                k.poison();
+                s_ni.poison();
+                s_be.poison();
+                k_be.poison();
+                s_ni_be.poison();
+                s_sub.poison();
+                a_neg_sub.poison();
+                k_sub.poison();
+                s_ni_sub.poison();
+            }
+            fn assert_same(&self, other: &Self) {
+                let CircuitStateCold {
+                    s,
+                    k,
+                    s_ni,
+                    s_be,
+                    k_be,
+                    s_ni_be,
+                    s_sub,
+                    a_neg_sub,
+                    k_sub,
+                    s_ni_sub,
+                } = self.as_ref();
+                s.assert_same(&other.s);
+                k.assert_same(&other.k);
+                s_ni.assert_same(&other.s_ni);
+                s_be.assert_same(&other.s_be);
+                k_be.assert_same(&other.k_be);
+                s_ni_be.assert_same(&other.s_ni_be);
+                s_sub.assert_same(&other.s_sub);
+                a_neg_sub.assert_same(&other.a_neg_sub);
+                k_sub.assert_same(&other.k_sub);
+                s_ni_sub.assert_same(&other.s_ni_sub);
+            }
+        }
+        fn poison_state(state: &mut CircuitState) {
+            macro_rules! poison_fields {
+                ($($field:ident),+ $(,)?) => {
+                    let CircuitState { $($field),+ } = state;
+                    $($field.poison();)+
+                };
+            }
+            circuit_state_fields!(poison_fields);
+        }
+        fn assert_state_bits(actual: &CircuitState, expected: &CircuitState) {
+            macro_rules! assert_fields {
+                ($($field:ident),+ $(,)?) => {
+                    let CircuitState { $($field),+ } = actual;
+                    $($field.assert_same(&expected.$field);)+
+                };
+            }
+            circuit_state_fields!(assert_fields);
+        }
+
+        #[test]
+        fn heavy_reset_reuses_box_and_matches_native_state_bits() {
+            // Native, near-native tolerance boundaries, and oversampled host rates.
+            for rate in [44100.0, 44100.5, 44100.75, 88200.0, 96000.0, 192000.0] {
+                let mut amp = PowerAmp::new_at_sample_rate(rate);
+                let expected = init_state(rate); // Original native clone retained as reference.
+                let cold_pointer = amp.state.cold.as_ref() as *const CircuitStateCold;
+                amp.last_good = -0.125;
+                for _ in 0..3 {
+                    poison_state(&mut amp.state);
+                    amp.rails.step(12.0);
+                    amp.reset();
+                    assert_eq!(
+                        cold_pointer,
+                        amp.state.cold.as_ref() as *const CircuitStateCold
+                    );
+                    assert_state_bits(&amp.state, &expected);
+                    assert_eq!(amp.last_good.to_bits(), (-0.125f64).to_bits());
+                    assert_eq!(
+                        amp.rails.rail_voltages(),
+                        (super::super::RAIL_DC_BIAS, super::super::RAIL_DC_BIAS)
+                    );
+                    assert_eq!(amp.rails.i_avg_pos.to_bits(), 0.0f64.to_bits());
+                    assert_eq!(amp.rails.i_avg_neg.to_bits(), 0.0f64.to_bits());
+                }
+            }
+        }
+
+        #[test]
+        fn heavy_reset_following_audio_matches_native_reset_bits() {
+            for rate in [44100.0, 88200.0, 96000.0, 192000.0] {
+                for rail_sag in [false, true] {
+                    let mut actual = PowerAmp::new_at_sample_rate(rate);
+                    let mut native = PowerAmp::new_at_sample_rate(rate);
+                    actual.set_rail_sag(rail_sag);
+                    native.set_rail_sag(rail_sag);
+                    for index in 0..256 {
+                        let input = (index as f64 * 0.071).sin() * 0.05;
+                        assert_eq!(
+                            actual.process(input).to_bits(),
+                            native.process(input).to_bits()
+                        );
+                    }
+                    actual.reset();
+                    native.state = init_state(rate);
+                    native.rails.reset();
+                    assert_state_bits(&actual.state, &native.state);
+                    assert_eq!(actual.last_good.to_bits(), native.last_good.to_bits());
+                    for index in 0..512 {
+                        let input = (index as f64 * 0.043).sin() * 0.08;
+                        assert_eq!(
+                            actual.process(input).to_bits(),
+                            native.process(input).to_bits()
+                        );
+                    }
+                }
+            }
         }
     }
 
@@ -496,6 +760,11 @@ mod melange_adapter {
 
 #[cfg(not(feature = "legacy-power-amp"))]
 pub use melange_adapter::PowerAmp;
+
+#[cfg(feature = "runtime-models")]
+pub use behavioral::PowerAmp as FastPowerAmp;
+#[cfg(feature = "runtime-models")]
+pub use melange_adapter::PowerAmp as HeavyPowerAmp;
 
 #[cfg(test)]
 mod tests {

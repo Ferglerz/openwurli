@@ -12,8 +12,10 @@
 //! moves. Hosts can call setters at block rate without their own smoothers.
 //! Block-rate params (MLP, DI limiter, noise) take effect immediately.
 
+#[cfg(not(feature = "runtime-models"))]
 use crate::dk_preamp::DkPreamp;
 use crate::oversampler::Oversampler;
+#[cfg(not(feature = "runtime-models"))]
 use crate::power_amp::PowerAmp;
 use crate::preamp::PreampModel;
 use crate::speaker::Speaker;
@@ -129,6 +131,195 @@ impl LinearSmoother {
     }
 }
 
+/// Circuit pair selected at runtime. Both modes share voices and MIDI state.
+#[cfg(feature = "runtime-models")]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum CircuitMode {
+    #[default]
+    Fast,
+    Heavy,
+}
+
+#[cfg(feature = "runtime-models")]
+impl CircuitMode {
+    fn weight(self) -> f64 {
+        match self {
+            Self::Fast => 0.0,
+            Self::Heavy => 1.0,
+        }
+    }
+}
+
+#[cfg(feature = "runtime-models")]
+trait RuntimeAmp {
+    fn process(&mut self, input: f64) -> f64;
+    fn reset(&mut self);
+}
+
+#[cfg(feature = "runtime-models")]
+macro_rules! runtime_amp {
+    ($ty:ty) => {
+        impl RuntimeAmp for $ty {
+            fn process(&mut self, input: f64) -> f64 {
+                <$ty>::process(self, input)
+            }
+            fn reset(&mut self) {
+                <$ty>::reset(self)
+            }
+        }
+    };
+}
+#[cfg(feature = "runtime-models")]
+runtime_amp!(crate::power_amp::FastPowerAmp);
+#[cfg(feature = "runtime-models")]
+runtime_amp!(crate::power_amp::HeavyPowerAmp);
+
+/// Per-model circuit history. Oscillators, MIDI and parameter clocks live in
+/// WurliEngine; no second voice bank is rendered while a model is hidden.
+#[cfg(feature = "runtime-models")]
+struct CircuitChain<P, A> {
+    preamp: P,
+    amp: A,
+    oversampler: Oversampler,
+    speaker: Speaker,
+    up: Vec<f64>,
+    out: Vec<f64>,
+    #[cfg(test)]
+    drive_peak: f64,
+    #[cfg(test)]
+    drive_sumsq: f64,
+    #[cfg(test)]
+    drive_n: u64,
+}
+
+#[cfg(feature = "runtime-models")]
+impl<P: PreampModel, A: RuntimeAmp> CircuitChain<P, A> {
+    fn new(preamp: P, amp: A, sample_rate: f64) -> Self {
+        Self {
+            preamp,
+            amp,
+            oversampler: Oversampler::new(),
+            speaker: Speaker::new(sample_rate),
+            up: vec![0.0; MAX_BLOCK_SIZE * 2],
+            out: vec![0.0; MAX_BLOCK_SIZE],
+            #[cfg(test)]
+            drive_peak: 0.0,
+            #[cfg(test)]
+            drive_sumsq: 0.0,
+            #[cfg(test)]
+            drive_n: 0,
+        }
+    }
+
+    fn ensure_buffer_capacity(&mut self, len: usize) {
+        if self.out.len() < len {
+            self.out.resize(len, 0.0);
+            self.up.resize(len * 2, 0.0);
+        }
+    }
+
+    fn reset(&mut self) {
+        self.preamp.reset();
+        self.amp.reset();
+        self.oversampler.reset();
+        self.speaker.reset();
+    }
+
+    fn process_bus(&mut self, input: &[f64], ldr: &[f64], oversample: bool) {
+        let len = input.len();
+        if oversample {
+            self.oversampler.upsample_2x(input, &mut self.up[..len * 2]);
+        }
+        let count = if oversample { len * 2 } else { len };
+        for i in 0..count {
+            self.preamp.set_ldr_resistance(ldr[i]);
+            let signal = if oversample { self.up[i] } else { input[i] };
+            let drive = self.preamp.process_sample(signal) * tables::FIXED_CIRCUIT_DRIVE;
+            #[cfg(test)]
+            {
+                self.drive_peak = self.drive_peak.max(drive.abs());
+                self.drive_sumsq += drive * drive;
+                self.drive_n += 1;
+            }
+            let value = self.amp.process(drive);
+            if oversample {
+                self.up[i] = value;
+            } else {
+                self.out[i] = value;
+            }
+        }
+        if oversample {
+            self.oversampler
+                .downsample_2x(&self.up[..len * 2], &mut self.out[..len]);
+        }
+    }
+
+    fn shape(&mut self, index: usize, character: f64) -> f64 {
+        self.speaker.set_character(character);
+        self.speaker.process(self.out[index])
+    }
+}
+
+#[cfg(feature = "runtime-models")]
+struct RuntimeCircuits {
+    fast: CircuitChain<crate::dk_preamp::FastPreamp, crate::power_amp::FastPowerAmp>,
+    heavy: CircuitChain<crate::dk_preamp::HeavyPreamp, crate::power_amp::HeavyPowerAmp>,
+    ldr: Vec<f64>,
+    mode: CircuitMode,
+    mix: LinearSmoother,
+    preroll_samples: u32,
+    preroll_remaining: u32,
+}
+
+#[cfg(feature = "runtime-models")]
+impl RuntimeCircuits {
+    fn new(sample_rate: f64, os_rate: f64, mode: CircuitMode) -> Self {
+        Self {
+            fast: CircuitChain::new(
+                crate::dk_preamp::FastPreamp::new(os_rate),
+                crate::power_amp::FastPowerAmp::new_at_sample_rate(os_rate),
+                sample_rate,
+            ),
+            heavy: CircuitChain::new(
+                crate::dk_preamp::HeavyPreamp::new(os_rate),
+                crate::power_amp::HeavyPowerAmp::new_at_sample_rate(os_rate),
+                sample_rate,
+            ),
+            ldr: vec![0.0; MAX_BLOCK_SIZE * 2],
+            mode,
+            mix: LinearSmoother::new(mode.weight(), (sample_rate * 0.020).round().max(1.0) as u32),
+            preroll_samples: (sample_rate * 0.100).round().max(1.0) as u32,
+            preroll_remaining: 0,
+        }
+    }
+
+    fn ensure_buffer_capacity(&mut self, len: usize) {
+        self.fast.ensure_buffer_capacity(len);
+        self.heavy.ensure_buffer_capacity(len);
+        if self.ldr.len() < len * 2 {
+            self.ldr.resize(len * 2, 0.0);
+        }
+    }
+
+    fn reset(&mut self) {
+        self.fast.reset();
+        self.heavy.reset();
+        self.preroll_remaining = 0;
+        self.mix.snap_to(self.mode.weight());
+    }
+
+    fn running(&self, warming: bool) -> (bool, bool) {
+        if warming || self.preroll_remaining > 0 || self.mix.samples_remaining > 0 {
+            (true, true)
+        } else {
+            (
+                self.mode == CircuitMode::Fast,
+                self.mode == CircuitMode::Heavy,
+            )
+        }
+    }
+}
+
 /// Wurlitzer 200A synth engine — owns voices, signal chain, and all
 /// params except the host-facing parameter container.
 ///
@@ -156,6 +347,7 @@ pub struct WurliEngine {
     age_counter: u64,
 
     // Shared signal chain (mono, post voice-sum)
+    #[cfg(not(feature = "runtime-models"))]
     preamp: DkPreamp,
 
     /// Test-only power-amp drive probe. Accumulates peak and mean-square of
@@ -170,15 +362,23 @@ pub struct WurliEngine {
     #[cfg(test)]
     pub(crate) drive_n: u64,
     tremolo: Tremolo,
+    #[cfg(not(feature = "runtime-models"))]
     oversampler: Oversampler,
+    #[cfg(not(feature = "runtime-models"))]
     power_amp: PowerAmp,
+    #[cfg(not(feature = "runtime-models"))]
     speaker: Speaker,
 
     // Pre-allocated scratch buffers
     voice_buf: Vec<f64>,
     sum_buf: Vec<f64>,
+    #[cfg(not(feature = "runtime-models"))]
     up_buf: Vec<f64>,
     out_buf: Vec<f64>,
+    #[cfg(feature = "runtime-models")]
+    circuits: RuntimeCircuits,
+    #[cfg(feature = "runtime-models")]
+    warming_circuits: bool,
 
     // Sample rates
     sample_rate: f64,
@@ -216,6 +416,7 @@ impl WurliEngine {
         Self {
             voices: (0..MAX_VOICES).map(|_| VoiceSlot::default()).collect(),
             age_counter: 0,
+            #[cfg(not(feature = "runtime-models"))]
             preamp: DkPreamp::new(os_sr),
             #[cfg(test)]
             drive_peak: 0.0,
@@ -224,18 +425,26 @@ impl WurliEngine {
             #[cfg(test)]
             drive_n: 0,
             tremolo: Tremolo::new(0.5, os_sr),
+            #[cfg(not(feature = "runtime-models"))]
             oversampler: Oversampler::new(),
             // Power amp runs at the oversampled rate alongside the preamp so
             // the BE integrator inside the melange-generated solver gets a
             // small enough timestep to avoid manufacturing high-order harmonics
             // on harmonic-rich inputs. Speaker stays at base rate (linear,
             // doesn't benefit from oversampling).
+            #[cfg(not(feature = "runtime-models"))]
             power_amp: PowerAmp::new_at_sample_rate(os_sr),
+            #[cfg(not(feature = "runtime-models"))]
             speaker: Speaker::new(sample_rate),
             voice_buf: vec![0.0; MAX_BLOCK_SIZE],
             sum_buf: vec![0.0; MAX_BLOCK_SIZE],
+            #[cfg(not(feature = "runtime-models"))]
             up_buf: vec![0.0; MAX_BLOCK_SIZE * 2],
             out_buf: vec![0.0; MAX_BLOCK_SIZE],
+            #[cfg(feature = "runtime-models")]
+            circuits: RuntimeCircuits::new(sample_rate, os_sr, CircuitMode::Fast),
+            #[cfg(feature = "runtime-models")]
+            warming_circuits: false,
             sample_rate,
             os_sample_rate: os_sr,
             oversample,
@@ -250,6 +459,43 @@ impl WurliEngine {
         }
     }
 
+    /// Construct with an initial mode without introducing a crossfade. Like
+    /// `new`, call warm_up/reset/set_sample_rate during host initialization.
+    #[cfg(feature = "runtime-models")]
+    pub fn new_with_circuit_mode(sample_rate: f64, mode: CircuitMode) -> Self {
+        let mut engine = Self::new(sample_rate);
+        engine.circuits.mode = mode;
+        engine.circuits.mix.snap_to(mode.weight());
+        engine
+    }
+
+    /// Resume a stopped circuit with 100 ms of streamed live-input settling,
+    /// then crossfade for 20 ms. The old mode remains audible while settling.
+    /// No allocation, blocking warmup, solver reset or note-on occurs here.
+    /// Cancelling settling keeps the old mode; an active fade reverses from its
+    /// current blend without settling either already-running circuit again.
+    #[cfg(feature = "runtime-models")]
+    pub fn set_circuit_mode(&mut self, mode: CircuitMode) {
+        if self.circuits.mode != mode {
+            self.circuits.mode = mode;
+            if self.circuits.preroll_remaining > 0 {
+                // With two modes this returns to the still-audible endpoint.
+                self.circuits.preroll_remaining = 0;
+                self.circuits.mix.snap_to(mode.weight());
+            } else if self.circuits.mix.samples_remaining > 0 {
+                self.circuits.mix.set_target(mode.weight());
+            } else {
+                // Keep the existing endpoint and feed both histories in render.
+                self.circuits.preroll_remaining = self.circuits.preroll_samples;
+            }
+        }
+    }
+
+    #[cfg(feature = "runtime-models")]
+    pub fn circuit_mode(&self) -> CircuitMode {
+        self.circuits.mode
+    }
+
     pub fn reset(&mut self) {
         for slot in &mut self.voices {
             slot.state = VoiceState::Free;
@@ -257,11 +503,16 @@ impl WurliEngine {
             slot.steal_voice = None;
             slot.steal_fade = 0;
         }
-        self.preamp.reset();
+        #[cfg(not(feature = "runtime-models"))]
+        {
+            self.preamp.reset();
+            self.oversampler.reset();
+            self.power_amp.reset();
+            self.speaker.reset();
+        }
+        #[cfg(feature = "runtime-models")]
+        self.circuits.reset();
         self.tremolo.reset();
-        self.oversampler.reset();
-        self.power_amp.reset();
-        self.speaker.reset();
         self.age_counter = 0;
         self.sustain_held = false;
         // Snap smoothers so a ramp doesn't survive a transport reset.
@@ -281,6 +532,10 @@ impl WurliEngine {
     /// `reset()` and `set_sample_rate()` so the first note is always clean.
     /// Not on the per-buffer path — a one-time settle, allocation-free.
     pub fn warm_up(&mut self) {
+        #[cfg(feature = "runtime-models")]
+        {
+            self.warming_circuits = true;
+        }
         let mut scratch = [0.0f32; 512];
         let total = (self.sample_rate * 0.6) as usize;
         let mut done = 0;
@@ -289,18 +544,36 @@ impl WurliEngine {
             self.render(&mut scratch[..len]);
             done += len;
         }
+        #[cfg(feature = "runtime-models")]
+        {
+            self.warming_circuits = false;
+        }
     }
 
     pub fn set_sample_rate(&mut self, sr: f64) {
         self.sample_rate = sr;
         self.oversample = sr < 88_200.0;
         self.os_sample_rate = if self.oversample { sr * 2.0 } else { sr };
-        self.preamp = DkPreamp::new(self.os_sample_rate);
+        #[cfg(not(feature = "runtime-models"))]
+        {
+            self.preamp = DkPreamp::new(self.os_sample_rate);
+        }
+        #[cfg(feature = "runtime-models")]
+        {
+            self.circuits = RuntimeCircuits::new(sr, self.os_sample_rate, self.circuits.mode);
+            // The voice buffers can already exceed the constructor's default
+            // capacity. Keep rebuilt circuit buffers aligned before warmup or
+            // a host render reuses that previously reserved block size.
+            self.circuits.ensure_buffer_capacity(self.sum_buf.len());
+        }
         self.tremolo = Tremolo::new(self.tremolo_depth.target, self.os_sample_rate);
         self.tremolo.set_response_multiplier(self.tremolo_response);
-        self.oversampler = Oversampler::new();
-        self.power_amp = PowerAmp::new_at_sample_rate(self.os_sample_rate);
-        self.speaker = Speaker::new(sr);
+        #[cfg(not(feature = "runtime-models"))]
+        {
+            self.oversampler = Oversampler::new();
+            self.power_amp = PowerAmp::new_at_sample_rate(self.os_sample_rate);
+            self.speaker = Speaker::new(sr);
+        }
         let ramp = ramp_samples_for_rate(sr);
         self.volume.set_ramp_samples(ramp);
         self.tremolo_depth.set_ramp_samples(ramp);
@@ -312,7 +585,10 @@ impl WurliEngine {
         if self.sum_buf.len() < max_samples {
             self.voice_buf.resize(max_samples, 0.0);
             self.sum_buf.resize(max_samples, 0.0);
+            #[cfg(not(feature = "runtime-models"))]
             self.up_buf.resize(max_samples * 2, 0.0);
+            #[cfg(feature = "runtime-models")]
+            self.circuits.ensure_buffer_capacity(max_samples);
             self.out_buf.resize(max_samples, 0.0);
         }
     }
@@ -437,11 +713,23 @@ impl WurliEngine {
     }
 
     pub fn set_noise_enabled(&mut self, on: bool) {
+        #[cfg(not(feature = "runtime-models"))]
         self.preamp.set_noise_enabled(on);
+        #[cfg(feature = "runtime-models")]
+        {
+            self.circuits.fast.preamp.set_noise_enabled(on);
+            self.circuits.heavy.preamp.set_noise_enabled(on);
+        }
     }
 
     pub fn set_noise_gain(&mut self, gain: f64) {
+        #[cfg(not(feature = "runtime-models"))]
         self.preamp.set_thermal_gain(gain);
+        #[cfg(feature = "runtime-models")]
+        {
+            self.circuits.fast.preamp.set_thermal_gain(gain);
+            self.circuits.heavy.preamp.set_thermal_gain(gain);
+        }
     }
 
     /// Enable / disable rail sag modeling on the power amp. On by default
@@ -449,11 +737,27 @@ impl WurliEngine {
     /// the pre-rail-sag adapter. See `power_amp.rs` `RailDynamics` and
     /// `docs/research/output-stage.md` §4.3.1.
     pub fn set_rail_sag(&mut self, on: bool) {
+        #[cfg(not(feature = "runtime-models"))]
         self.power_amp.set_rail_sag(on);
+        #[cfg(feature = "runtime-models")]
+        {
+            self.circuits.fast.amp.set_rail_sag(on);
+            self.circuits.heavy.amp.set_rail_sag(on);
+        }
     }
 
     pub fn rail_sag_enabled(&self) -> bool {
-        self.power_amp.rail_sag_enabled()
+        #[cfg(not(feature = "runtime-models"))]
+        {
+            self.power_amp.rail_sag_enabled()
+        }
+        #[cfg(feature = "runtime-models")]
+        {
+            match self.circuits.mode {
+                CircuitMode::Fast => self.circuits.fast.amp.rail_sag_enabled(),
+                CircuitMode::Heavy => self.circuits.heavy.amp.rail_sag_enabled(),
+            }
+        }
     }
 
     /// Power-amp diagnostic snapshot:
@@ -461,12 +765,23 @@ impl WurliEngine {
     /// Use during diagnostic renders to see if the divergence guard is
     /// firing, NR is failing, or the amp is producing unphysical voltages.
     pub fn power_amp_diag(&self) -> (u64, u64, f64) {
-        self.power_amp.diag_snapshot()
+        #[cfg(not(feature = "runtime-models"))]
+        {
+            self.power_amp.diag_snapshot()
+        }
+        #[cfg(feature = "runtime-models")]
+        {
+            match self.circuits.mode {
+                CircuitMode::Fast => self.circuits.fast.amp.diag_snapshot(),
+                CircuitMode::Heavy => self.circuits.heavy.amp.diag_snapshot(),
+            }
+        }
     }
 
     // ── Render ───────────────────────────────────────────────────────────
 
     /// Render `out.len()` mono samples through the full chain.
+    #[cfg(not(feature = "runtime-models"))]
     pub fn render(&mut self, out: &mut [f32]) {
         let len = out.len();
         if len == 0 {
@@ -504,6 +819,124 @@ impl WurliEngine {
         }
 
         self.cleanup_voices();
+    }
+
+    /// Render one circuit pair, or both during 100 ms of live-input settling
+    /// followed by a 20 ms crossfade. No extra voice bank or blocking warmup.
+    /// Buffers are allocated at construction/ensure_buffer_capacity, never here.
+    #[cfg(feature = "runtime-models")]
+    pub fn render(&mut self, out: &mut [f32]) {
+        let mut position = 0;
+        while position < out.len() {
+            // Start the fade exactly after the last settling sample and stop
+            // the outgoing circuit exactly at fade completion, even mid-block.
+            let transition_limit = if self.circuits.preroll_remaining > 0 {
+                self.circuits.preroll_remaining as usize
+            } else if self.circuits.mix.samples_remaining > 0 {
+                self.circuits.mix.samples_remaining as usize
+            } else {
+                usize::MAX
+            };
+            let len = (out.len() - position)
+                .min(self.sum_buf.len())
+                .min(transition_limit);
+            let (fast, heavy) = self.circuits.running(self.warming_circuits);
+            self.render_voices_to_preamp_out(0, len);
+            for (i, sample_slot) in out[position..position + len].iter_mut().enumerate() {
+                let character = self.speaker_character.next();
+                let a = if fast {
+                    self.circuits.fast.shape(i, character)
+                } else {
+                    0.0
+                };
+                let b = if heavy {
+                    self.circuits.heavy.shape(i, character)
+                } else {
+                    0.0
+                };
+                let mix = self.circuits.mix.next();
+                // Endpoint branches retain the original floating-point output.
+                let shaped = if mix == 0.0 {
+                    a
+                } else if mix == 1.0 {
+                    b
+                } else {
+                    a + (b - a) * mix
+                };
+                let volume = self.volume.next();
+                let sample = (shaped * tables::POST_SPEAKER_GAIN * volume) as f32;
+                *sample_slot = if sample.is_finite() {
+                    sample
+                } else {
+                    // Existing fault recovery, never entered merely by a switch.
+                    if fast {
+                        self.circuits.fast.reset();
+                    }
+                    if heavy {
+                        self.circuits.heavy.reset();
+                    }
+                    0.0
+                };
+            }
+            if self.circuits.preroll_remaining > 0 {
+                self.circuits.preroll_remaining -= len as u32;
+                if self.circuits.preroll_remaining == 0 {
+                    self.circuits.mix.set_target(self.circuits.mode.weight());
+                }
+            }
+            self.cleanup_voices();
+            position += len;
+        }
+    }
+
+    #[cfg(feature = "runtime-models")]
+    fn render_runtime_circuit_bus(&mut self, offset: usize, len: usize) {
+        let factor = if self.oversample { 2 } else { 1 };
+        for i in 0..len {
+            self.tremolo.set_depth(self.tremolo_depth.next());
+            for j in 0..factor {
+                self.circuits.ldr[i * factor + j] = self.tremolo.process();
+            }
+        }
+        let (fast, heavy) = self.circuits.running(self.warming_circuits);
+        if fast {
+            self.circuits.fast.process_bus(
+                &self.sum_buf[..len],
+                &self.circuits.ldr[..len * factor],
+                self.oversample,
+            );
+        }
+        if heavy {
+            self.circuits.heavy.process_bus(
+                &self.sum_buf[..len],
+                &self.circuits.ldr[..len * factor],
+                self.oversample,
+            );
+        }
+        // Preserve the existing introspection endpoint (pre speaker/gain).
+        let selected = match self.circuits.mode {
+            CircuitMode::Fast => &self.circuits.fast.out,
+            CircuitMode::Heavy => &self.circuits.heavy.out,
+        };
+        self.out_buf[offset..offset + len].copy_from_slice(&selected[..len]);
+        #[cfg(test)]
+        {
+            let (peak, sumsq, n) = match self.circuits.mode {
+                CircuitMode::Fast => (
+                    self.circuits.fast.drive_peak,
+                    self.circuits.fast.drive_sumsq,
+                    self.circuits.fast.drive_n,
+                ),
+                CircuitMode::Heavy => (
+                    self.circuits.heavy.drive_peak,
+                    self.circuits.heavy.drive_sumsq,
+                    self.circuits.heavy.drive_n,
+                ),
+            };
+            self.drive_peak = peak;
+            self.drive_sumsq = sumsq;
+            self.drive_n = n;
+        }
     }
 
     /// Render voices through the preamp and write into `self.out_buf[offset..offset+len]`.
@@ -571,27 +1004,54 @@ impl WurliEngine {
             }
         }
 
-        if self.oversample {
-            self.oversampler
-                .upsample_2x(&self.sum_buf[..len], &mut self.up_buf[..len * 2]);
+        #[cfg(feature = "runtime-models")]
+        self.render_runtime_circuit_bus(offset, len);
+        #[cfg(not(feature = "runtime-models"))]
+        {
+            if self.oversample {
+                self.oversampler
+                    .upsample_2x(&self.sum_buf[..len], &mut self.up_buf[..len * 2]);
 
-            // Per base-rate sample: advance tremolo depth + volume smoothers
-            // once. Run the preamp + power amp twice (once per OS sample) so
-            // both nonlinear stages see 88.2 kHz timestep — critical for the
-            // melange BE integrator inside the power amp not to manufacture
-            // high-order harmonics from the harmonic-rich pickup output.
-            for i in 0..len {
-                let depth = self.tremolo_depth.next();
-                self.tremolo.set_depth(depth);
+                // Per base-rate sample: advance tremolo depth + volume smoothers
+                // once. Run the preamp + power amp twice (once per OS sample) so
+                // both nonlinear stages see 88.2 kHz timestep — critical for the
+                // melange BE integrator inside the power amp not to manufacture
+                // high-order harmonics from the harmonic-rich pickup output.
+                for i in 0..len {
+                    let depth = self.tremolo_depth.next();
+                    self.tremolo.set_depth(depth);
 
-                for j in 0..2 {
-                    let idx = i * 2 + j;
+                    for j in 0..2 {
+                        let idx = i * 2 + j;
+                        let r_ldr = self.tremolo.process();
+                        self.preamp.set_ldr_resistance(r_ldr);
+                        let preamp_out = self.preamp.process_sample(self.up_buf[idx]);
+                        // Pin BJT drive at the clean operating point. User volume
+                        // is applied post-amp in render() as a linear multiplier
+                        // (decoupled from circuit drive — see FIXED_CIRCUIT_DRIVE).
+                        let drive = preamp_out * tables::FIXED_CIRCUIT_DRIVE;
+                        #[cfg(test)]
+                        {
+                            self.drive_peak = self.drive_peak.max(drive.abs());
+                            self.drive_sumsq += drive * drive;
+                            self.drive_n += 1;
+                        }
+                        self.up_buf[idx] = self.power_amp.process(drive);
+                    }
+                }
+
+                self.oversampler.downsample_2x(
+                    &self.up_buf[..len * 2],
+                    &mut self.out_buf[offset..offset + len],
+                );
+            } else {
+                for i in 0..len {
+                    let depth = self.tremolo_depth.next();
+                    self.tremolo.set_depth(depth);
                     let r_ldr = self.tremolo.process();
                     self.preamp.set_ldr_resistance(r_ldr);
-                    let preamp_out = self.preamp.process_sample(self.up_buf[idx]);
-                    // Pin BJT drive at the clean operating point. User volume
-                    // is applied post-amp in render() as a linear multiplier
-                    // (decoupled from circuit drive — see FIXED_CIRCUIT_DRIVE).
+                    let preamp_out = self.preamp.process_sample(self.sum_buf[i]);
+                    // Drive pinned; user volume applied post-amp in render().
                     let drive = preamp_out * tables::FIXED_CIRCUIT_DRIVE;
                     #[cfg(test)]
                     {
@@ -599,30 +1059,8 @@ impl WurliEngine {
                         self.drive_sumsq += drive * drive;
                         self.drive_n += 1;
                     }
-                    self.up_buf[idx] = self.power_amp.process(drive);
+                    self.out_buf[offset + i] = self.power_amp.process(drive);
                 }
-            }
-
-            self.oversampler.downsample_2x(
-                &self.up_buf[..len * 2],
-                &mut self.out_buf[offset..offset + len],
-            );
-        } else {
-            for i in 0..len {
-                let depth = self.tremolo_depth.next();
-                self.tremolo.set_depth(depth);
-                let r_ldr = self.tremolo.process();
-                self.preamp.set_ldr_resistance(r_ldr);
-                let preamp_out = self.preamp.process_sample(self.sum_buf[i]);
-                // Drive pinned; user volume applied post-amp in render().
-                let drive = preamp_out * tables::FIXED_CIRCUIT_DRIVE;
-                #[cfg(test)]
-                {
-                    self.drive_peak = self.drive_peak.max(drive.abs());
-                    self.drive_sumsq += drive * drive;
-                    self.drive_n += 1;
-                }
-                self.out_buf[offset + i] = self.power_amp.process(drive);
             }
         }
     }
@@ -751,6 +1189,167 @@ fn ramp_samples_for_rate(sample_rate: f64) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(feature = "runtime-models")]
+    #[test]
+    fn runtime_model_capacity_survives_sample_rate_change() {
+        let capacity = MAX_BLOCK_SIZE + 257;
+        let mut engine = WurliEngine::new_with_circuit_mode(48_000.0, CircuitMode::Fast);
+        engine.ensure_buffer_capacity(capacity);
+        engine.set_sample_rate(44_100.0);
+        // Hosts may reserve the same block size again after initialization.
+        engine.ensure_buffer_capacity(capacity);
+        let mut output = vec![0.0; capacity];
+        engine.render(&mut output);
+        assert!(output.iter().all(|x| x.is_finite()));
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        engine.render(&mut output);
+        assert!(output.iter().all(|x| x.is_finite()));
+        assert_eq!(engine.circuit_mode(), CircuitMode::Heavy);
+    }
+
+    #[cfg(feature = "runtime-models")]
+    #[test]
+    fn runtime_model_preroll_keeps_old_audio_and_has_exact_boundaries() {
+        let mut engine = WurliEngine::new_with_circuit_mode(48_000.0, CircuitMode::Fast);
+        let mut reference = WurliEngine::new_with_circuit_mode(48_000.0, CircuitMode::Fast);
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.samples_remaining, 0);
+        assert_eq!(engine.circuits.mix.current, 0.0);
+        engine.note_on(60, 0.8);
+        reference.note_on(60, 0.8);
+        let age = engine.age_counter;
+        let compare_old_audio = |engine: &mut WurliEngine, reference: &mut WurliEngine, len| {
+            let mut actual = vec![0.0; len];
+            let mut expected = vec![0.0; len];
+            engine.render(&mut actual);
+            reference.render(&mut expected);
+            assert_eq!(
+                actual.iter().map(|x| x.to_bits()).collect::<Vec<_>>(),
+                expected.iter().map(|x| x.to_bits()).collect::<Vec<_>>(),
+                "settling must leave outgoing audio unchanged"
+            );
+        };
+        compare_old_audio(&mut engine, &mut reference, 128);
+        let heavy_before = engine.circuits.heavy.drive_n;
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        assert_eq!(engine.circuits.preroll_remaining, 4800);
+        compare_old_audio(&mut engine, &mut reference, 17);
+        assert_eq!(engine.circuits.heavy.drive_n - heavy_before, 34);
+        assert_eq!(engine.circuits.preroll_remaining, 4783);
+        assert_eq!(engine.circuits.mix.current, 0.0);
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        assert_eq!(
+            engine.circuits.preroll_remaining, 4783,
+            "same target must not restart settling"
+        );
+        engine.set_circuit_mode(CircuitMode::Fast);
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.samples_remaining, 0);
+        let heavy_before = engine.circuits.heavy.drive_n;
+        compare_old_audio(&mut engine, &mut reference, 48);
+        assert_eq!(
+            engine.circuits.heavy.drive_n, heavy_before,
+            "cancelled incoming chain must stop"
+        );
+
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        compare_old_audio(&mut engine, &mut reference, 4799);
+        assert_eq!(engine.circuits.preroll_remaining, 1);
+        let heavy_before = engine.circuits.heavy.drive_n;
+        let mut edge = [0.0; 2];
+        let mut old = [0.0; 2];
+        engine.render(&mut edge);
+        reference.render(&mut old);
+        assert_eq!(
+            edge[0].to_bits(),
+            old[0].to_bits(),
+            "last settling sample stays at old endpoint"
+        );
+        assert_eq!(engine.circuits.heavy.drive_n - heavy_before, 4);
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.samples_remaining, 959);
+        assert!(engine.circuits.mix.current > 0.0);
+        let blend = engine.circuits.mix.current;
+        engine.set_circuit_mode(CircuitMode::Fast);
+        assert_eq!(
+            engine.circuits.mix.current, blend,
+            "fade reversal must be continuous"
+        );
+        assert_eq!(
+            engine.circuits.preroll_remaining, 0,
+            "both chains are already running"
+        );
+        let heavy_before = engine.circuits.heavy.drive_n;
+        engine.render(&mut [0.0; 961]);
+        assert_eq!(
+            engine.circuits.heavy.drive_n - heavy_before,
+            1920,
+            "hidden chain stops at the fade endpoint inside the block"
+        );
+        assert_eq!(engine.circuits.mix.current, 0.0);
+        assert_eq!(engine.age_counter, age);
+        assert_eq!(engine.held_voice_count(), 1);
+
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        engine.reset();
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.current, 1.0);
+        engine.set_circuit_mode(CircuitMode::Fast);
+        engine.set_sample_rate(96_000.0);
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.preroll_samples, 9600);
+        assert_eq!(engine.circuits.mix.current, 0.0);
+    }
+
+    #[cfg(feature = "runtime-models")]
+    #[test]
+    fn runtime_model_switch_preserves_notes_and_stops_hidden_chain() {
+        let mut engine = WurliEngine::new_with_circuit_mode(48_000.0, CircuitMode::Fast);
+        engine.warm_up();
+        engine.note_on(60, 0.8);
+        engine.note_on(67, 0.6);
+        let age = engine.age_counter;
+        let heavy_before = engine.circuits.heavy.drive_n;
+        engine.render(&mut [0.0; 128]);
+        assert_eq!(engine.circuits.heavy.drive_n, heavy_before);
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        let mut settling = vec![0.0; engine.circuits.preroll_samples as usize];
+        engine.render(&mut settling);
+        assert!(settling.iter().all(|x| x.is_finite()));
+        assert_eq!(engine.circuits.preroll_remaining, 0);
+        assert_eq!(engine.circuits.mix.current, 0.0);
+        let fast_before = engine.circuits.fast.drive_n;
+        let heavy_before = engine.circuits.heavy.drive_n;
+        let mut transition = [0.0; 96];
+        engine.render(&mut transition);
+        assert!(transition.iter().all(|x| x.is_finite()));
+        assert_eq!(engine.circuits.fast.drive_n - fast_before, 192);
+        assert_eq!(engine.circuits.heavy.drive_n - heavy_before, 192);
+        let mix = engine.circuits.mix.current;
+        assert!(mix > 0.0 && mix < 1.0);
+        engine.set_circuit_mode(CircuitMode::Fast);
+        assert_eq!(
+            engine.circuits.mix.current, mix,
+            "reversal must not jump the blend"
+        );
+        engine.render(&mut [0.0; 17]);
+        assert!(engine.circuits.mix.current < mix);
+        engine.set_circuit_mode(CircuitMode::Heavy);
+        let mut transition = [0.0; 1200];
+        engine.render(&mut transition);
+        assert!(transition.iter().all(|x| x.is_finite()));
+        assert_eq!(engine.circuits.mix.current, 1.0);
+        let fast_before = engine.circuits.fast.drive_n;
+        engine.render(&mut [0.0; 257]);
+        assert_eq!(engine.circuits.fast.drive_n, fast_before);
+        assert_eq!(
+            engine.age_counter, age,
+            "switching must not create/reseed voices"
+        );
+        assert_eq!(engine.held_voice_count(), 2);
+        assert_eq!(engine.active_voice_count(), 2);
+    }
 
     fn engine() -> WurliEngine {
         WurliEngine::new(44_100.0)
