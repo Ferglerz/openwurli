@@ -8813,6 +8813,27 @@ fn sparse_lu_back_solve(a_lu: &[[f64; N]; N], dr: &[f64; N], dc: &[f64; N], b: &
 /// Includes backward Euler fallback for unconditional stability.
 #[inline]
 pub fn process_sample(input: f64, state: &mut CircuitState) -> [f64; NUM_OUTPUTS] {
+    process_sample_impl::<true>(input, state)
+}
+
+/// Primary solve for the adapter that discards every primary failure anyway.
+/// `None` requires the caller to restore its settled state and hold its last
+/// output immediately. No generated state from that sample may be consumed.
+/// The public `process_sample` remains the complete circuit reference.
+#[inline]
+pub(crate) fn process_sample_guarded(
+    input: f64,
+    state: &mut CircuitState,
+) -> Option<[f64; NUM_OUTPUTS]> {
+    let output = process_sample_impl::<false>(input, state);
+    (state.last_nr_iterations < MAX_ITER as u32).then_some(output)
+}
+
+#[inline]
+fn process_sample_impl<const COMPLETE_RECOVERY: bool>(
+    input: f64,
+    state: &mut CircuitState,
+) -> [f64; NUM_OUTPUTS] {
     let input = if input.is_finite() {
         input.clamp(-100.0, 100.0)
     } else {
@@ -9777,6 +9798,14 @@ pub fn process_sample(input: f64, state: &mut CircuitState) -> [f64; NUM_OUTPUTS
             i_nl = i_nl_resid;
             break;
         }
+    }
+
+    // The guarded adapter rejects the unchanged primary-failure sentinel even
+    // when subsequent recovery converges. It restores every circuit field and
+    // its rails, so those recovery calculations cannot affect its next sample.
+    // Leave the complete reference, settling and raw diagnostic paths intact.
+    if !COMPLETE_RECOVERY && !converged {
+        return [0.0; NUM_OUTPUTS]; // Converted to None by process_sample_guarded.
     }
 
     // Adaptive sub-stepping: retry with subdivided timestep

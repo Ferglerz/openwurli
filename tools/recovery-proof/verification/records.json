@@ -1,0 +1,68 @@
+{
+  "source_fork_base": "b51f8dad3c5fb62070a20a11e20bf2886b8ff860",
+  "fork_remote": "https://github.com/Ferglerz/openwurli.git",
+  "branch": "codex/heavy-recovery-shortcut",
+  "production_source_sha256": {
+    "Cargo.toml": "2b49a42e9f447918d4a731d74e4777eb408cced75ff7dfb16242423672cabf8e",
+    "src/engine.rs": "6bfe54c5befb28f2b3ff0ce0e53f7c46b31ab081ae682314dba5afb65997f824",
+    "src/gen_power_amp.rs": "ca5af1a905fe625886354c5c8b603d819c88dffe4d1201bbed570d8b9646b7b9",
+    "src/power_amp.rs": "13c672a49ce8c2db8ba8d6214d4c0781e9dc3b83030fd29bbfbebe5efb822986"
+  },
+  "checks": [
+    {
+      "command": "cargo check -p openwurli-ui",
+      "location": "audio-plugins workspace",
+      "exit_code": 0,
+      "log": "compile-check.txt"
+    },
+    {
+      "command": "cargo clippy -p openwurli-dsp --features runtime-models",
+      "location": "OpenWurli source fork",
+      "exit_code": 0,
+      "log": "clippy.txt"
+    },
+    {
+      "command": "cargo test -p openwurli-dsp --release --lib --features runtime-models heavy_recovery --quiet",
+      "location": "OpenWurli source fork",
+      "exit_code": 0,
+      "log": "state-test-default.txt"
+    },
+    {
+      "command": "RUSTFLAGS='--cfg melange_precise_exp' CARGO_TARGET_DIR=/private/tmp/openwurli-recovery-precise-target cargo test -p openwurli-dsp --release --lib --features runtime-models heavy_recovery --quiet",
+      "location": "OpenWurli source fork",
+      "exit_code": 0,
+      "log": "state-test-native-exp.txt"
+    },
+    {
+      "command": "./openwurli-ui/scripts/install.sh",
+      "location": "audio-plugins workspace",
+      "exit_code": 0,
+      "log": "install.txt"
+    }
+  ],
+  "independent_review": "Sol review: no actionable findings after direct generated recovery proof and actual iteration-249 coverage.",
+  "installed_executables": {
+    "vst3": {
+      "installed_sha256": "659831310126cb8ec7108f0351bd46484cf7891870a062486368d3a0acdabeca",
+      "bundled_sha256": "659831310126cb8ec7108f0351bd46484cf7891870a062486368d3a0acdabeca",
+      "identical": true
+    },
+    "clap": {
+      "installed_sha256": "659831310126cb8ec7108f0351bd46484cf7891870a062486368d3a0acdabeca",
+      "bundled_sha256": "659831310126cb8ec7108f0351bd46484cf7891870a062486368d3a0acdabeca",
+      "identical": true
+    }
+  },
+  "package_reproduction": {
+    "preparation": "fresh /private/tmp directory from packaged archives",
+    "build_exit_code": 0,
+    "audio_exit_code": 0,
+    "compared_samples": 48256,
+    "different_bits": 0,
+    "cases": [
+      "prior-review-heavy6",
+      "prior-review-heavy64"
+    ],
+    "results": "packaged-smoke/report.json"
+  }
+}

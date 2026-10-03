@@ -425,8 +425,21 @@ mod melange_adapter {
         }
     }
 
+    /// Lifetime counts since construction, retained across solver/host resets.
+    /// These describe events, not Newton iteration totals: a failed primary
+    /// solve's iteration field is a sentinel, including early LU failures.
+    #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+    pub struct SolverDiagnostics {
+        pub primary_failures: u64,
+        pub skipped_recoveries: u64,
+        pub recovery_attempts: u64,
+        pub guard_resets: u64,
+        pub last_iteration_rejections: u64,
+    }
+
     pub struct PowerAmp {
         state: CircuitState,
+        diagnostics: SolverDiagnostics,
         sample_rate: f64,
         /// Last confirmed-good adapter output; used to hold continuity when
         /// the melange solver diverges and we have to reset.
@@ -455,6 +468,7 @@ mod melange_adapter {
         pub fn new_at_sample_rate(sample_rate: f64) -> Self {
             Self {
                 state: init_state(sample_rate),
+                diagnostics: SolverDiagnostics::default(),
                 sample_rate,
                 last_good: 0.0,
                 rails: super::RailDynamics::new(sample_rate),
@@ -492,6 +506,10 @@ mod melange_adapter {
         }
 
         pub fn process(&mut self, input: f64) -> f64 {
+            self.process_with_recovery::<{ cfg!(feature = "reference-full-recovery") }>(input)
+        }
+
+        fn process_with_recovery<const COMPLETE_RECOVERY: bool>(&mut self, input: f64) -> f64 {
             // Push runtime rail offsets BEFORE process_sample so the solver
             // sees the rail state computed from the previous sample's draw.
             if self.rail_sag_on {
@@ -500,7 +518,27 @@ mod melange_adapter {
                 self.state.v_rail_neg_offset = off_neg;
             }
 
-            let raw = gen_power_amp::process_sample(input, &mut self.state)[0];
+            let output = if COMPLETE_RECOVERY {
+                Some(gen_power_amp::process_sample(input, &mut self.state))
+            } else {
+                gen_power_amp::process_sample_guarded(input, &mut self.state)
+            };
+            if self.state.last_nr_iterations >= gen_power_amp::MAX_ITER as u32 {
+                self.diagnostics.primary_failures =
+                    self.diagnostics.primary_failures.saturating_add(1);
+                if COMPLETE_RECOVERY {
+                    self.diagnostics.recovery_attempts =
+                        self.diagnostics.recovery_attempts.saturating_add(1);
+                } else {
+                    self.diagnostics.skipped_recoveries =
+                        self.diagnostics.skipped_recoveries.saturating_add(1);
+                }
+            }
+            let Some([raw]) = output else {
+                self.diagnostics.guard_resets = self.diagnostics.guard_resets.saturating_add(1);
+                self.reset();
+                return self.last_good;
+            };
             let result = raw / HEADROOM;
 
             // Divergence guard. Under continuous polyphonic playing, the
@@ -535,6 +573,11 @@ mod melange_adapter {
                 .iter()
                 .any(|v| !v.is_finite() || v.abs() > 100.0);
             if !result.is_finite() || nr_failed || state_insane {
+                self.diagnostics.guard_resets = self.diagnostics.guard_resets.saturating_add(1);
+                if self.state.last_nr_iterations == gen_power_amp::MAX_ITER as u32 - 1 {
+                    self.diagnostics.last_iteration_rejections =
+                        self.diagnostics.last_iteration_rejections.saturating_add(1);
+                }
                 self.reset();
                 return self.last_good;
             }
@@ -558,6 +601,11 @@ mod melange_adapter {
         /// non-physical branch. Not called by the normal plugin path.
         pub fn diag_raw_process(&mut self, input: f64) -> f64 {
             gen_power_amp::process_sample(input, &mut self.state)[0] / HEADROOM
+        }
+
+        /// Counts that survive the cached-state reset, unlike `diag_snapshot`.
+        pub fn solver_diagnostics(&self) -> SolverDiagnostics {
+            self.diagnostics
         }
 
         /// Snapshot of melange NR diagnostics:
@@ -691,6 +739,138 @@ mod melange_adapter {
             circuit_state_fields!(assert_fields);
         }
 
+        fn assert_rail_bits(
+            actual: &super::super::RailDynamics,
+            expected: &super::super::RailDynamics,
+        ) {
+            let super::super::RailDynamics {
+                v_rail_pos,
+                v_rail_neg,
+                i_avg_pos,
+                i_avg_neg,
+                alpha_attack,
+                alpha_release,
+                alpha_i_avg,
+            } = actual;
+            for (a, b) in [
+                (*v_rail_pos, expected.v_rail_pos),
+                (*v_rail_neg, expected.v_rail_neg),
+                (*i_avg_pos, expected.i_avg_pos),
+                (*i_avg_neg, expected.i_avg_neg),
+                (*alpha_attack, expected.alpha_attack),
+                (*alpha_release, expected.alpha_release),
+                (*alpha_i_avg, expected.alpha_i_avg),
+            ] {
+                assert_eq!(a.to_bits(), b.to_bits());
+            }
+        }
+
+        #[test]
+        fn heavy_recovery_shortcut_preserves_audio_and_complete_state() {
+            let mut primary_failures = 0;
+            let mut complete_recovery_verified = false;
+            for rate in [44100.0, 88200.0, 96000.0, 192000.0] {
+                for sag in [false, true] {
+                    let mut actual = PowerAmp::new_at_sample_rate(rate);
+                    let mut reference = PowerAmp::new_at_sample_rate(rate);
+                    actual.set_rail_sag(sag);
+                    reference.set_rail_sag(sag);
+                    let cold_pointer = actual.state.cold.as_ref() as *const CircuitStateCold;
+                    for index in 0..1536 {
+                        // Smooth notes, abrupt polyphonic transients, polarity
+                        // changes and sanitized nonfinite input, all deterministic.
+                        let input = match index % 384 {
+                            0 => f64::NAN,
+                            1 => f64::INFINITY,
+                            2 => f64::NEG_INFINITY,
+                            3..=127 => (index as f64 * 0.071).sin() * 0.05,
+                            128..=255 => (index as f64 * 0.143).sin() * 1.5,
+                            _ => {
+                                if index % 2 == 0 {
+                                    0.6
+                                } else {
+                                    -0.6
+                                }
+                            }
+                        };
+                        // Capture a real failing solve before adapter reset can
+                        // hide evidence that the full generated path recovers.
+                        let failure_fixture = (!complete_recovery_verified).then(|| {
+                            let mut state = actual.state.clone();
+                            if actual.rail_sag_on {
+                                let (pos, neg) = actual.rails.offsets();
+                                state.v_rail_pos_offset = pos;
+                                state.v_rail_neg_offset = neg;
+                            }
+                            state
+                        });
+                        let failures_before = actual.diagnostics.primary_failures;
+                        let a = actual.process_with_recovery::<false>(input);
+                        let b = reference.process_with_recovery::<true>(input);
+                        if actual.diagnostics.primary_failures > failures_before {
+                            if let Some(mut guarded) = failure_fixture {
+                                let mut full = guarded.clone();
+                                let before = (full.diag_substep_count, full.diag_be_fallback_count);
+                                assert!(
+                                    gen_power_amp::process_sample_guarded(input, &mut guarded)
+                                        .is_none()
+                                );
+                                let _ = gen_power_amp::process_sample(input, &mut full);
+                                assert!(
+                                    full.diag_substep_count > before.0
+                                        || full.diag_be_fallback_count > before.1,
+                                    "complete generated solver must still perform recovery"
+                                );
+                                assert_eq!(
+                                    (guarded.diag_substep_count, guarded.diag_be_fallback_count),
+                                    before
+                                );
+                                complete_recovery_verified = true;
+                            }
+                        }
+
+                        assert_eq!(
+                            a.to_bits(),
+                            b.to_bits(),
+                            "rate {rate}, sag {sag}, sample {index}"
+                        );
+                        // Exhaustive circuit and rail equality includes accepted
+                        // state and every reset, not just matching audible output.
+                        assert_state_bits(&actual.state, &reference.state);
+                        assert_rail_bits(&actual.rails, &reference.rails);
+                        assert_eq!(actual.last_good.to_bits(), reference.last_good.to_bits());
+                        assert_eq!(
+                            cold_pointer,
+                            actual.state.cold.as_ref() as *const CircuitStateCold
+                        );
+                        if index == 767 {
+                            let before = actual.solver_diagnostics();
+                            actual.reset();
+                            reference.reset();
+                            assert_eq!(actual.solver_diagnostics(), before);
+                            actual.set_rail_sag(!sag);
+                            reference.set_rail_sag(!sag);
+                        }
+                    }
+                    let a = actual.solver_diagnostics();
+                    let b = reference.solver_diagnostics();
+                    assert_eq!(a.primary_failures, b.primary_failures);
+                    assert_eq!(a.guard_resets, b.guard_resets);
+                    assert_eq!(a.last_iteration_rejections, b.last_iteration_rejections);
+                    assert_eq!(a.skipped_recoveries, a.primary_failures);
+                    assert_eq!(a.recovery_attempts, 0);
+                    assert_eq!(b.recovery_attempts, b.primary_failures);
+                    assert_eq!(b.skipped_recoveries, 0);
+                    primary_failures += a.primary_failures;
+                }
+            }
+            assert!(
+                primary_failures > 0,
+                "stress must exercise discarded recovery"
+            );
+            assert!(complete_recovery_verified);
+        }
+
         #[test]
         fn heavy_reset_reuses_box_and_matches_native_state_bits() {
             // Native, near-native tolerance boundaries, and oversampled host rates.
@@ -765,6 +945,9 @@ pub use melange_adapter::PowerAmp;
 pub use behavioral::PowerAmp as FastPowerAmp;
 #[cfg(feature = "runtime-models")]
 pub use melange_adapter::PowerAmp as HeavyPowerAmp;
+
+#[cfg(any(not(feature = "legacy-power-amp"), feature = "runtime-models"))]
+pub use melange_adapter::SolverDiagnostics as HeavySolverDiagnostics;
 
 #[cfg(test)]
 mod tests {

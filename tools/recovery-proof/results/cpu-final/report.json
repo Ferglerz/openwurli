@@ -1,0 +1,3491 @@
+{
+  "conditions": "48k, MLP/hiss off, volume0.5, speaker0, native rails, exact0.95 velocity, 0.6s warmup excluded. Alternating pair order, isolated sequential trials. Callback render only; separate note event timing. Short-run wall-clock evidence, not DAW meters.",
+  "rows": [
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 9181.194960212202,
+      "depth": 0.0,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": -0.6029887003064394,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 2899.958,
+            "note_on_total_ns": 9708,
+            "p99_block_us": 2895.333,
+            "render_ns_per_sample": 9169.358960543766
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 2902.75,
+            "note_on_total_ns": 11584,
+            "p99_block_us": 2898.708,
+            "render_ns_per_sample": 9114.400157493368
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 2899.625,
+            "note_on_total_ns": 9541,
+            "p99_block_us": 2893.541,
+            "render_ns_per_sample": 9232.49266412467
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 2970.333,
+            "note_on_total_ns": 9542,
+            "p99_block_us": 2951.166,
+            "render_ns_per_sample": 9169.951052718832
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 2913.208,
+            "note_on_total_ns": 10708,
+            "p99_block_us": 2897.5,
+            "render_ns_per_sample": 9143.19321949602
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 2954.459,
+            "note_on_total_ns": 10542,
+            "p99_block_us": 2936.125,
+            "render_ns_per_sample": 9189.558562665783
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 2984.708,
+            "note_on_total_ns": 10042,
+            "p99_block_us": 2974.542,
+            "render_ns_per_sample": 9210.680122679045
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 2980.75,
+            "note_on_total_ns": 9917,
+            "p99_block_us": 2894.458,
+            "render_ns_per_sample": 9132.681241710876
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 3253.292,
+            "note_on_total_ns": 10000,
+            "p99_block_us": 2924.792,
+            "render_ns_per_sample": 9181.194960212202
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4615945704148877259,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 16976755391651649646,
+            "max_block_us": 3040.334,
+            "note_on_total_ns": 13959,
+            "p99_block_us": 2892.584,
+            "render_ns_per_sample": 9151.079782824934
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 9151.079782824934,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 1
+    },
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 12719.169554045093,
+      "depth": 0.5,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 15.030383676980119,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              5,
+              5,
+              0,
+              5,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 5100.792,
+            "note_on_total_ns": 14375,
+            "p99_block_us": 4038.334,
+            "render_ns_per_sample": 12550.280586870027
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 26555.375,
+            "note_on_total_ns": 10334,
+            "p99_block_us": 15051.291,
+            "render_ns_per_sample": 14805.61841014589
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              5,
+              5,
+              0,
+              5,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 4973.083,
+            "note_on_total_ns": 11292,
+            "p99_block_us": 4122.541,
+            "render_ns_per_sample": 12719.169554045093
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 26198.0,
+            "note_on_total_ns": 10459,
+            "p99_block_us": 14844.041,
+            "render_ns_per_sample": 14775.373300729443
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              5,
+              5,
+              0,
+              5,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 5094.708,
+            "note_on_total_ns": 10083,
+            "p99_block_us": 4109.25,
+            "render_ns_per_sample": 12711.215392904509
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 26396.084,
+            "note_on_total_ns": 10250,
+            "p99_block_us": 14973.541,
+            "render_ns_per_sample": 14980.771178713529
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              5,
+              5,
+              0,
+              5,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 5448.625,
+            "note_on_total_ns": 15625,
+            "p99_block_us": 4082.6250000000005,
+            "render_ns_per_sample": 12874.105562002653
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 26874.875,
+            "note_on_total_ns": 9416,
+            "p99_block_us": 15375.916,
+            "render_ns_per_sample": 15021.042025862069
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              5,
+              5,
+              0,
+              5,
+              0
+            ],
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 4982.041,
+            "note_on_total_ns": 14583,
+            "p99_block_us": 4086.0,
+            "render_ns_per_sample": 12763.540575265251
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 1,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 1,
+              "nan": 0,
+              "peak_bits": 4612032261885949165,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 2085765626396087490,
+            "max_block_us": 26780.583,
+            "note_on_total_ns": 10834,
+            "p99_block_us": 14913.25,
+            "render_ns_per_sample": 15021.299527519894
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 14980.771178713529,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 1
+    },
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 13351.182567970822,
+      "depth": 0.0,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 26.912129874451296,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              12,
+              12,
+              0,
+              12,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 5821.541,
+            "note_on_total_ns": 39417,
+            "p99_block_us": 5478.333,
+            "render_ns_per_sample": 13402.10862897878
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 28508.375,
+            "note_on_total_ns": 39833,
+            "p99_block_us": 27774.083,
+            "render_ns_per_sample": 18336.980686339524
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              12,
+              12,
+              0,
+              12,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 5726.292,
+            "note_on_total_ns": 38458,
+            "p99_block_us": 5448.084,
+            "render_ns_per_sample": 13300.050646551725
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 28258.417,
+            "note_on_total_ns": 39583,
+            "p99_block_us": 27867.916,
+            "render_ns_per_sample": 18242.23599137931
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              12,
+              12,
+              0,
+              12,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 5912.542,
+            "note_on_total_ns": 41167,
+            "p99_block_us": 5607.75,
+            "render_ns_per_sample": 13351.182567970822
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 28678.708,
+            "note_on_total_ns": 40209,
+            "p99_block_us": 27800.708,
+            "render_ns_per_sample": 18242.684598806365
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              12,
+              12,
+              0,
+              12,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 5978.417,
+            "note_on_total_ns": 39292,
+            "p99_block_us": 5574.0,
+            "render_ns_per_sample": 13383.494653514588
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 28208.333,
+            "note_on_total_ns": 39709,
+            "p99_block_us": 28168.541,
+            "render_ns_per_sample": 18301.188826259946
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              12,
+              12,
+              0,
+              12,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 5844.584,
+            "note_on_total_ns": 40708,
+            "p99_block_us": 5467.5,
+            "render_ns_per_sample": 13255.12052387268
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4617624810556397368,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18085768479454840678,
+            "max_block_us": 28151.5,
+            "note_on_total_ns": 40417,
+            "p99_block_us": 27857.708,
+            "render_ns_per_sample": 18283.299568965518
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 18283.299568965518,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 6
+    },
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 15889.75658985411,
+      "depth": 0.5,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 27.436965954439373,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              13,
+              13,
+              0,
+              14,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 6774.375,
+            "note_on_total_ns": 39375,
+            "p99_block_us": 5991.416,
+            "render_ns_per_sample": 15869.57737897878
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 29246.458,
+            "note_on_total_ns": 40083,
+            "p99_block_us": 29199.584,
+            "render_ns_per_sample": 21870.05765086207
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              13,
+              13,
+              0,
+              14,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 6763.167,
+            "note_on_total_ns": 39250,
+            "p99_block_us": 6032.375,
+            "render_ns_per_sample": 15867.788544429708
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 29576.083,
+            "note_on_total_ns": 40333,
+            "p99_block_us": 29246.25,
+            "render_ns_per_sample": 21768.840600132626
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              13,
+              13,
+              0,
+              14,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 6822.958,
+            "note_on_total_ns": 39792,
+            "p99_block_us": 5972.916,
+            "render_ns_per_sample": 16145.51040285146
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 29464.583,
+            "note_on_total_ns": 39792,
+            "p99_block_us": 29025.75,
+            "render_ns_per_sample": 21764.611405835545
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              13,
+              13,
+              0,
+              14,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 6770.084,
+            "note_on_total_ns": 42417,
+            "p99_block_us": 6037.833,
+            "render_ns_per_sample": 15889.75658985411
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 29530.542,
+            "note_on_total_ns": 38833,
+            "p99_block_us": 29241.125,
+            "render_ns_per_sample": 21911.140417771883
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              13,
+              13,
+              0,
+              14,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 6772.75,
+            "note_on_total_ns": 39583,
+            "p99_block_us": 6015.792,
+            "render_ns_per_sample": 15991.04786969496
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4615195079895956443,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 11156565907587061269,
+            "max_block_us": 29575.0,
+            "note_on_total_ns": 39167,
+            "p99_block_us": 29503.667,
+            "render_ns_per_sample": 22045.97865550398
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 21870.05765086207,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 6
+    },
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 14856.404923740052,
+      "depth": 0.0,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 40.310886314604886,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              23,
+              23,
+              0,
+              23,
+              0
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 5885.792,
+            "note_on_total_ns": 190666,
+            "p99_block_us": 5382.542,
+            "render_ns_per_sample": 14800.629310344828
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 39677.042,
+            "note_on_total_ns": 190208,
+            "p99_block_us": 27583.791,
+            "render_ns_per_sample": 25009.599552387266
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              23,
+              23,
+              0,
+              23,
+              0
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 5857.75,
+            "note_on_total_ns": 199541,
+            "p99_block_us": 5497.25,
+            "render_ns_per_sample": 14889.40973143236
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 39123.625,
+            "note_on_total_ns": 190916,
+            "p99_block_us": 27330.875,
+            "render_ns_per_sample": 24823.099676724138
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              23,
+              23,
+              0,
+              23,
+              0
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 5790.875,
+            "note_on_total_ns": 189292,
+            "p99_block_us": 5508.75,
+            "render_ns_per_sample": 14828.872554708223
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 39051.292,
+            "note_on_total_ns": 190541,
+            "p99_block_us": 27182.75,
+            "render_ns_per_sample": 24763.87562168435
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              23,
+              23,
+              0,
+              23,
+              0
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 5600.917,
+            "note_on_total_ns": 191250,
+            "p99_block_us": 5493.125,
+            "render_ns_per_sample": 14891.966677718832
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 40211.625,
+            "note_on_total_ns": 190583,
+            "p99_block_us": 27676.75,
+            "render_ns_per_sample": 24996.989638594165
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              23,
+              23,
+              0,
+              23,
+              0
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 5649.209,
+            "note_on_total_ns": 191084,
+            "p99_block_us": 5578.958,
+            "render_ns_per_sample": 14856.404923740052
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4623468881497742984,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 84312908663214828,
+            "max_block_us": 40097.125,
+            "note_on_total_ns": 193750,
+            "p99_block_us": 27396.375,
+            "render_ns_per_sample": 24889.63900862069
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 24889.63900862069,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 32
+    },
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 16488.4074933687,
+      "depth": 0.5,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 16.630443751948633,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 5946.292,
+            "note_on_total_ns": 191042,
+            "p99_block_us": 5699.625,
+            "render_ns_per_sample": 16553.803299071616
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 28402.125,
+            "note_on_total_ns": 190917,
+            "p99_block_us": 17482.042,
+            "render_ns_per_sample": 19799.34793600796
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 5852.584,
+            "note_on_total_ns": 191333,
+            "p99_block_us": 5699.541,
+            "render_ns_per_sample": 16475.22409648541
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 28488.417,
+            "note_on_total_ns": 190333,
+            "p99_block_us": 17195.417,
+            "render_ns_per_sample": 19791.9119280504
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 5852.541,
+            "note_on_total_ns": 194917,
+            "p99_block_us": 5804.0,
+            "render_ns_per_sample": 16488.4074933687
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 28590.375,
+            "note_on_total_ns": 190834,
+            "p99_block_us": 17332.083,
+            "render_ns_per_sample": 19783.33778183024
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 5846.5,
+            "note_on_total_ns": 189959,
+            "p99_block_us": 5686.542,
+            "render_ns_per_sample": 16485.039829244033
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 28448.125,
+            "note_on_total_ns": 190958,
+            "p99_block_us": 17298.792,
+            "render_ns_per_sample": 19766.065525530503
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 5850.542,
+            "note_on_total_ns": 191083,
+            "p99_block_us": 5792.208,
+            "render_ns_per_sample": 16699.097645888593
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 32,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 32,
+              "nan": 0,
+              "peak_bits": 4622488215521404200,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 14938813602815669632,
+            "max_block_us": 28582.125,
+            "note_on_total_ns": 191208,
+            "p99_block_us": 17400.541,
+            "render_ns_per_sample": 20030.210543766578
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 19791.9119280504,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 32
+    },
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 27575.455155835545,
+      "depth": 0.0,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 59.11894040962127,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              87,
+              87,
+              0,
+              87,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 13848.625,
+            "note_on_total_ns": 383750,
+            "p99_block_us": 12590.208,
+            "render_ns_per_sample": 27210.22753647215
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 79224.417,
+            "note_on_total_ns": 378750,
+            "p99_block_us": 70088.791,
+            "render_ns_per_sample": 66559.49676724138
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              87,
+              87,
+              0,
+              87,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 13693.583,
+            "note_on_total_ns": 379500,
+            "p99_block_us": 12538.208,
+            "render_ns_per_sample": 27224.072281167108
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 82230.125,
+            "note_on_total_ns": 378917,
+            "p99_block_us": 70359.416,
+            "render_ns_per_sample": 67372.51856763926
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              87,
+              87,
+              0,
+              87,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 15033.125,
+            "note_on_total_ns": 415250,
+            "p99_block_us": 12854.667,
+            "render_ns_per_sample": 27706.694297082227
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 81184.458,
+            "note_on_total_ns": 378000,
+            "p99_block_us": 69926.25,
+            "render_ns_per_sample": 67292.81312168435
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              87,
+              87,
+              0,
+              87,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 14411.042,
+            "note_on_total_ns": 378167,
+            "p99_block_us": 12968.125,
+            "render_ns_per_sample": 27643.193053713527
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 80356.333,
+            "note_on_total_ns": 381542,
+            "p99_block_us": 70573.833,
+            "render_ns_per_sample": 67349.45213030504
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              87,
+              87,
+              0,
+              87,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 14257.041,
+            "note_on_total_ns": 382292,
+            "p99_block_us": 12825.125,
+            "render_ns_per_sample": 27575.455155835545
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622364015053131923,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 1570198891607278371,
+            "max_block_us": 81091.959,
+            "note_on_total_ns": 379166,
+            "p99_block_us": 70747.375,
+            "render_ns_per_sample": 71152.63241876657
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 67349.45213030504,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 64
+    },
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 26779.165119363395,
+      "depth": 0.5,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 47.06704816498816,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              55,
+              55,
+              0,
+              55,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 15043.167,
+            "note_on_total_ns": 384375,
+            "p99_block_us": 13303.25,
+            "render_ns_per_sample": 26768.41043600796
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 71962.25,
+            "note_on_total_ns": 384417,
+            "p99_block_us": 58179.917,
+            "render_ns_per_sample": 50380.748839522545
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              55,
+              55,
+              0,
+              55,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 14956.708,
+            "note_on_total_ns": 379000,
+            "p99_block_us": 13246.083,
+            "render_ns_per_sample": 26776.065939986736
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 72656.75,
+            "note_on_total_ns": 385083,
+            "p99_block_us": 58943.042,
+            "render_ns_per_sample": 50584.87201591512
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              55,
+              55,
+              0,
+              55,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 14959.917,
+            "note_on_total_ns": 379125,
+            "p99_block_us": 13283.041,
+            "render_ns_per_sample": 26779.165119363395
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 71537.875,
+            "note_on_total_ns": 379000,
+            "p99_block_us": 58076.625,
+            "render_ns_per_sample": 50317.589108090186
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              55,
+              55,
+              0,
+              55,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 14950.042,
+            "note_on_total_ns": 378750,
+            "p99_block_us": 13273.584,
+            "render_ns_per_sample": 26931.38888428382
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 71865.125,
+            "note_on_total_ns": 378875,
+            "p99_block_us": 60582.167,
+            "render_ns_per_sample": 51365.47102950928
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              55,
+              55,
+              0,
+              55,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 15959.792,
+            "note_on_total_ns": 387916,
+            "p99_block_us": 13308.542,
+            "render_ns_per_sample": 27171.674817639258
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 4622409181990204149,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 17008509867632800845,
+            "max_block_us": 71645.833,
+            "note_on_total_ns": 380042,
+            "p99_block_us": 64383.29099999999,
+            "render_ns_per_sample": 53701.86766412467
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 50584.87201591512,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 64
+    },
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 1191.772173408488,
+      "depth": 0.5,
+      "heavy": false,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 0.13953797859082018,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 509.37499999999994,
+            "note_on_total_ns": 39125,
+            "p99_block_us": 360.458,
+            "render_ns_per_sample": 1199.8127901193634
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 338.541,
+            "note_on_total_ns": 39250,
+            "p99_block_us": 333.792,
+            "render_ns_per_sample": 1202.366752320955
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 565.417,
+            "note_on_total_ns": 41291,
+            "p99_block_us": 372.625,
+            "render_ns_per_sample": 1209.429874005305
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 398.291,
+            "note_on_total_ns": 39250,
+            "p99_block_us": 356.708,
+            "render_ns_per_sample": 1206.6601458885941
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 335.084,
+            "note_on_total_ns": 39125,
+            "p99_block_us": 333.541,
+            "render_ns_per_sample": 1185.348474801061
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 401.5,
+            "note_on_total_ns": 40125,
+            "p99_block_us": 368.208,
+            "render_ns_per_sample": 1192.4025198938991
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 406.458,
+            "note_on_total_ns": 40959,
+            "p99_block_us": 333.5,
+            "render_ns_per_sample": 1191.772173408488
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 333.833,
+            "note_on_total_ns": 40667,
+            "p99_block_us": 324.458,
+            "render_ns_per_sample": 1186.282451923077
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 338.875,
+            "note_on_total_ns": 44667,
+            "p99_block_us": 336.0,
+            "render_ns_per_sample": 1186.1567473474802
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4402496669797720203,
+            "max_block_us": 333.584,
+            "note_on_total_ns": 39334,
+            "p99_block_us": 326.542,
+            "render_ns_per_sample": 1187.814199270557
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 1192.4025198938991,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 6
+    },
+    {
+      "block": 256,
+      "candidate_median_ns_per_sample": 1900.6236322944296,
+      "depth": 0.5,
+      "heavy": false,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": -0.040366404085356855,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 767.917,
+            "note_on_total_ns": 378291,
+            "p99_block_us": 642.125,
+            "render_ns_per_sample": 1903.3090185676392
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 778.917,
+            "note_on_total_ns": 394458,
+            "p99_block_us": 669.625,
+            "render_ns_per_sample": 1902.5410311671087
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 784.417,
+            "note_on_total_ns": 382666,
+            "p99_block_us": 656.5,
+            "render_ns_per_sample": 1896.6295590185675
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 1374.375,
+            "note_on_total_ns": 551958,
+            "p99_block_us": 1182.709,
+            "render_ns_per_sample": 2500.7078912466845
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 772.5,
+            "note_on_total_ns": 378292,
+            "p99_block_us": 642.75,
+            "render_ns_per_sample": 1900.6236322944296
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 768.708,
+            "note_on_total_ns": 379291,
+            "p99_block_us": 642.25,
+            "render_ns_per_sample": 1898.3737151856765
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 768.042,
+            "note_on_total_ns": 379917,
+            "p99_block_us": 642.333,
+            "render_ns_per_sample": 1903.8256797082229
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 768.0,
+            "note_on_total_ns": 384625,
+            "p99_block_us": 659.459,
+            "render_ns_per_sample": 1896.852453580902
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 95,
+            "candidate_lifetime_final": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 768.0,
+            "note_on_total_ns": 380583,
+            "p99_block_us": 641.875,
+            "render_ns_per_sample": 1896.5033985411142
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 95,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 64,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 64,
+              "nan": 0,
+              "peak_bits": 0,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 4746143005058675163,
+            "max_block_us": 768.167,
+            "note_on_total_ns": 378875,
+            "p99_block_us": 642.041,
+            "render_ns_per_sample": 1900.7706813660477
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 1900.7706813660477,
+      "repeats": 5,
+      "samples_per_trial": 24128,
+      "voices": 64
+    },
+    {
+      "block": 1,
+      "candidate_median_ns_per_sample": 17760.835815429688,
+      "depth": 0.5,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 34.91116894888017,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 8192,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 1468.708,
+            "note_on_total_ns": 43875,
+            "p99_block_us": 52.584,
+            "render_ns_per_sample": 17739.8251953125
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 8192,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 24940.833,
+            "note_on_total_ns": 40041,
+            "p99_block_us": 48.958,
+            "render_ns_per_sample": 27254.79150390625
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 8192,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 1444.959,
+            "note_on_total_ns": 39292,
+            "p99_block_us": 52.459,
+            "render_ns_per_sample": 17760.835815429688
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 8192,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 25474.0,
+            "note_on_total_ns": 39708,
+            "p99_block_us": 50.666,
+            "render_ns_per_sample": 27702.401489257812
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 8192,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 1495.166,
+            "note_on_total_ns": 39791,
+            "p99_block_us": 50.333,
+            "render_ns_per_sample": 17732.486938476562
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 8192,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 25047.625,
+            "note_on_total_ns": 39958,
+            "p99_block_us": 49.375,
+            "render_ns_per_sample": 27337.826782226562
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 8192,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 1529.083,
+            "note_on_total_ns": 39750,
+            "p99_block_us": 55.834,
+            "render_ns_per_sample": 18212.797729492188
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 8192,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 25250.458,
+            "note_on_total_ns": 40334,
+            "p99_block_us": 51.042,
+            "render_ns_per_sample": 27903.882446289062
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 8192,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 1453.292,
+            "note_on_total_ns": 42917,
+            "p99_block_us": 59.917,
+            "render_ns_per_sample": 18637.953002929688
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 8192,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 25053.166,
+            "note_on_total_ns": 39083,
+            "p99_block_us": 53.625,
+            "render_ns_per_sample": 28154.5634765625
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 27702.401489257812,
+      "repeats": 5,
+      "samples_per_trial": 8192,
+      "voices": 6
+    },
+    {
+      "block": 64,
+      "candidate_median_ns_per_sample": 17396.80419921875,
+      "depth": 0.5,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 36.81725047102119,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 128,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 3280.625,
+            "note_on_total_ns": 41625,
+            "p99_block_us": 2369.042,
+            "render_ns_per_sample": 18890.747680664062
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 128,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 29608.875,
+            "note_on_total_ns": 49667,
+            "p99_block_us": 15693.209,
+            "render_ns_per_sample": 34434.972412109375
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 128,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 3121.458,
+            "note_on_total_ns": 39958,
+            "p99_block_us": 2282.792,
+            "render_ns_per_sample": 17335.2353515625
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 128,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 27470.084,
+            "note_on_total_ns": 40083,
+            "p99_block_us": 14173.875,
+            "render_ns_per_sample": 27588.959228515625
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 128,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 3140.0,
+            "note_on_total_ns": 43667,
+            "p99_block_us": 2242.5,
+            "render_ns_per_sample": 17396.80419921875
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 128,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 27041.959,
+            "note_on_total_ns": 40125,
+            "p99_block_us": 13996.958,
+            "render_ns_per_sample": 27534.104370117188
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 128,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 3184.709,
+            "note_on_total_ns": 39167,
+            "p99_block_us": 2261.167,
+            "render_ns_per_sample": 17332.011596679688
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 128,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 27088.5,
+            "note_on_total_ns": 39625,
+            "p99_block_us": 13937.375,
+            "render_ns_per_sample": 27398.452270507812
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 128,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 6129.625,
+            "note_on_total_ns": 42583,
+            "p99_block_us": 2278.292,
+            "render_ns_per_sample": 18464.025024414062
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 128,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 27217.625,
+            "note_on_total_ns": 42208,
+            "p99_block_us": 14135.667,
+            "render_ns_per_sample": 27868.387939453125
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 27588.959228515625,
+      "repeats": 5,
+      "samples_per_trial": 8192,
+      "voices": 6
+    },
+    {
+      "block": 257,
+      "candidate_median_ns_per_sample": 17281.494384765625,
+      "depth": 0.5,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 36.152753868479145,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 32,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 6803.208,
+            "note_on_total_ns": 44792,
+            "p99_block_us": 6023.209,
+            "render_ns_per_sample": 17270.151611328125
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 32,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 29592.791,
+            "note_on_total_ns": 39250,
+            "p99_block_us": 29495.75,
+            "render_ns_per_sample": 27098.460083007812
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 32,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 6796.083,
+            "note_on_total_ns": 39500,
+            "p99_block_us": 6011.792,
+            "render_ns_per_sample": 17326.644897460938
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 32,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 29447.75,
+            "note_on_total_ns": 38750,
+            "p99_block_us": 29410.625,
+            "render_ns_per_sample": 27002.8583984375
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 32,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 6822.5,
+            "note_on_total_ns": 39333,
+            "p99_block_us": 6060.875,
+            "render_ns_per_sample": 17275.813110351562
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 32,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 29935.917,
+            "note_on_total_ns": 39709,
+            "p99_block_us": 29415.209,
+            "render_ns_per_sample": 27058.03955078125
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 32,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 6857.792,
+            "note_on_total_ns": 38959,
+            "p99_block_us": 6012.667,
+            "render_ns_per_sample": 17281.494384765625
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 32,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 29439.833,
+            "note_on_total_ns": 39750,
+            "p99_block_us": 29409.958,
+            "render_ns_per_sample": 26973.271484375
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 32,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 6929.25,
+            "note_on_total_ns": 40000,
+            "p99_block_us": 6017.042,
+            "render_ns_per_sample": 17309.783813476562
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 32,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 30726.333,
+            "note_on_total_ns": 40250,
+            "p99_block_us": 29325.542,
+            "render_ns_per_sample": 27161.326049804688
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 27058.03955078125,
+      "repeats": 5,
+      "samples_per_trial": 8192,
+      "voices": 6
+    },
+    {
+      "block": 1024,
+      "candidate_median_ns_per_sample": 17315.572143554688,
+      "depth": 0.5,
+      "heavy": true,
+      "paired_hashes_and_public_state_exact": true,
+      "paired_median_reduction_percent": 35.84365695311013,
+      "pairs": [
+        {
+          "candidate": {
+            "blocks": 8,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 20963.958,
+            "note_on_total_ns": 39541,
+            "p99_block_us": 18976.75,
+            "render_ns_per_sample": 17274.129272460938
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 8,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 56748.041,
+            "note_on_total_ns": 40625,
+            "p99_block_us": 44202.833,
+            "render_ns_per_sample": 27538.935180664062
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 8,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 20903.792,
+            "note_on_total_ns": 40666,
+            "p99_block_us": 18971.292,
+            "render_ns_per_sample": 17281.646606445312
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 8,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 55109.375,
+            "note_on_total_ns": 39292,
+            "p99_block_us": 42357.709,
+            "render_ns_per_sample": 27031.346801757812
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 8,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 21201.916,
+            "note_on_total_ns": 42041,
+            "p99_block_us": 19545.083,
+            "render_ns_per_sample": 17449.264526367188
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 8,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 54982.416,
+            "note_on_total_ns": 39458,
+            "p99_block_us": 42433.375,
+            "render_ns_per_sample": 27073.572509765625
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 8,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 21042.666,
+            "note_on_total_ns": 39708,
+            "p99_block_us": 19010.667,
+            "render_ns_per_sample": 17936.447021484375
+          },
+          "order": "candidate,reference",
+          "reference": {
+            "blocks": 8,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 56307.25,
+            "note_on_total_ns": 44667,
+            "p99_block_us": 44330.375,
+            "render_ns_per_sample": 27377.827758789062
+          }
+        },
+        {
+          "candidate": {
+            "blocks": 8,
+            "candidate_lifetime_final": [
+              7,
+              7,
+              0,
+              8,
+              1
+            ],
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 21029.709,
+            "note_on_total_ns": 39500,
+            "p99_block_us": 19040.833,
+            "render_ns_per_sample": 17315.572143554688
+          },
+          "order": "reference,candidate",
+          "reference": {
+            "blocks": 8,
+            "candidate_lifetime_final": null,
+            "final": {
+              "active": 6,
+              "amp_clamp": 0,
+              "amp_maxiter": 0,
+              "held": 6,
+              "nan": 0,
+              "peak_bits": 4619700197125926577,
+              "sustain": false,
+              "sustained": 0
+            },
+            "hash": 18236551047880470897,
+            "max_block_us": 54931.292,
+            "note_on_total_ns": 40291,
+            "p99_block_us": 42409.625,
+            "render_ns_per_sample": 26989.649536132812
+          }
+        }
+      ],
+      "reference_median_ns_per_sample": 27073.572509765625,
+      "repeats": 5,
+      "samples_per_trial": 8192,
+      "voices": 6
+    }
+  ]
+}

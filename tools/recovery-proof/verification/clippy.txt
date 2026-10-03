@@ -1,0 +1,6 @@
+    Checking bytemuck v1.25.2
+    Checking melange-primitives v0.1.7 (https://github.com/hal0zer0/melange?rev=7ecb36c#7ecb36c7)
+    Checking safe_arch v0.7.4
+    Checking wide v0.7.33
+    Checking openwurli-dsp v0.7.0 (/private/tmp/openwurli-decay-20260930/crates/openwurli-dsp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.34s

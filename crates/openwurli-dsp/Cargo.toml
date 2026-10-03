@@ -21,6 +21,8 @@ legacy-power-amp = []
 experimental-circuit-lut = []
 # Compile both circuit models for saved runtime Fast/Heavy selection.
 runtime-models = []
+# Preserve the complete original Heavy adapter path for fidelity/CPU comparisons.
+reference-full-recovery = []
 
 [lints.rust]
 unexpected_cfgs = { level = "allow", check-cfg = ['cfg(melange_precise_exp)'] }

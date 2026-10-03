@@ -1,0 +1,5 @@
+    Checking nih_plug_vizia v0.0.0 (/Users/ferg/GitHub/audio-plugins/Damian Channel Strip/vendor/nih-plug/nih_plug_vizia)
+    Checking openwurli-dsp v0.7.0 (/Users/ferg/GitHub/audio-plugins/openwurli-ui/vendor/openwurli-dsp)
+    Checking pleasant-ui v0.1.0 (/Users/ferg/GitHub/audio-plugins/pleasant-ui)
+    Checking openwurli-ui v0.1.1 (/Users/ferg/GitHub/audio-plugins/openwurli-ui)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.84s

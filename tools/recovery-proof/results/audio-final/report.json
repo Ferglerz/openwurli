@@ -1,0 +1,2555 @@
+{
+  "all_exact": true,
+  "cases": [
+    {
+      "block": 256,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4615195079895956443,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        13,
+        13,
+        0,
+        14,
+        1
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "prior-review-heavy6",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4615195079895956443,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 11156565907587061269,
+      "samples": 24128
+    },
+    {
+      "block": 256,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4622409181990204149,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        55,
+        55,
+        0,
+        55,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "prior-review-heavy64",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4622409181990204149,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 17008509867632800845,
+      "samples": 24128
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "44100-fast-mlpfalse-held6",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 870598855948510571,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "44100-fast-mlpfalse-held64",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 14132174977391642719,
+      "samples": 12288
+    },
+    {
+      "block": 1,
+      "candidate_final": {
+        "active": 34,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "44100-fast-mlpfalse-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 34,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 11555704883826758513,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "44100-fast-mlptrue-held6",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 6975481270526228489,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "44100-fast-mlptrue-held64",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 18320290999679008511,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 34,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "44100-fast-mlptrue-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 34,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 1561355174611612352,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4617488192693419437,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        15,
+        15,
+        0,
+        15,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "44100-heavy-mlpfalse-held6",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4617488192693419437,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 16242833342264033607,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626632883996620143,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        125,
+        125,
+        0,
+        126,
+        1
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "44100-heavy-mlpfalse-held64",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626632883996620143,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 289018317085788134,
+      "samples": 12288
+    },
+    {
+      "block": 1,
+      "candidate_final": {
+        "active": 34,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4620984350868616032,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        391,
+        391,
+        0,
+        393,
+        2
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "44100-heavy-mlpfalse-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 34,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4620984350868616032,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 18146630516776759255,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4617621947506485611,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        15,
+        15,
+        0,
+        15,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "44100-heavy-mlptrue-held6",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4617621947506485611,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 7348002909607672978,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626634802174375152,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        100,
+        100,
+        0,
+        102,
+        2
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "44100-heavy-mlptrue-held64",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626634802174375152,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 6897581769290284378,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 34,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4621050654124103938,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        452,
+        452,
+        0,
+        452,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "44100-heavy-mlptrue-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 44100,
+      "reference_final": {
+        "active": 34,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4621050654124103938,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 14616098597287464317,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "48000-fast-mlpfalse-held6",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 2029645431328899540,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "48000-fast-mlpfalse-held64",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 4000169830978514172,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 37,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "48000-fast-mlpfalse-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 37,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 4623293723742535139,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "48000-fast-mlptrue-held6",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 15881752891452489245,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "48000-fast-mlptrue-held64",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 8563764979716479426,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 37,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "48000-fast-mlptrue-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 37,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 9731080810764694976,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4612642504608042824,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        14,
+        14,
+        0,
+        14,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "48000-heavy-mlpfalse-held6",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4612642504608042824,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 17382322155290357547,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626634919241154056,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        101,
+        101,
+        0,
+        101,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "48000-heavy-mlpfalse-held64",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626634919241154056,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 11678431934210914243,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 37,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4618634394076405355,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        441,
+        441,
+        0,
+        441,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "48000-heavy-mlpfalse-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 37,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4618634394076405355,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 232390556986837405,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4621405467051449617,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        9,
+        9,
+        0,
+        9,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "48000-heavy-mlptrue-held6",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4621405467051449617,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 973932611504663250,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4623568405663232134,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        121,
+        121,
+        0,
+        122,
+        1
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "48000-heavy-mlptrue-held64",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4623568405663232134,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 2226311013175958577,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 37,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4619743895087441775,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        486,
+        486,
+        0,
+        486,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "48000-heavy-mlptrue-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 37,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4619743895087441775,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 15615287050363852208,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "88200-fast-mlpfalse-held6",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 14467816290818415633,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "88200-fast-mlpfalse-held64",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 8454616086915582703,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 53,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "88200-fast-mlpfalse-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 53,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 12277114238533950318,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "88200-fast-mlptrue-held6",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 14253106082870943404,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "88200-fast-mlptrue-held64",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 8837556440052185764,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 53,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "88200-fast-mlptrue-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 53,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 8261173217541006708,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4621871592420326884,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        6,
+        6,
+        0,
+        6,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "88200-heavy-mlpfalse-held6",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4621871592420326884,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 5467478197173834890,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4620850589602689288,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        71,
+        71,
+        0,
+        72,
+        1
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "88200-heavy-mlpfalse-held64",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4620850589602689288,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 1497503732756406680,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 53,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4617401297640339305,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        248,
+        248,
+        0,
+        248,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "88200-heavy-mlpfalse-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 53,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4617401297640339305,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 17875199027412613030,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4609997455544345235,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        7,
+        7,
+        0,
+        7,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "88200-heavy-mlptrue-held6",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4609997455544345235,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 9828064073495459575,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626516325115179224,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        59,
+        59,
+        0,
+        59,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "88200-heavy-mlptrue-held64",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626516325115179224,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 9099034494583013279,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 53,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4617460403389779818,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        209,
+        209,
+        0,
+        210,
+        1
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "88200-heavy-mlptrue-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 88200,
+      "reference_final": {
+        "active": 53,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4617460403389779818,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 15018476071208364618,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "96000-fast-mlpfalse-held6",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 17198519815942552441,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "96000-fast-mlpfalse-held64",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 16103316699037537213,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 56,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": false,
+      "name": "96000-fast-mlpfalse-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 56,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 3949503462696039150,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "96000-fast-mlptrue-held6",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 5923710482087549049,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "96000-fast-mlptrue-held64",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 3306681540981218747,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 56,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "96000-fast-mlptrue-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 56,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 14016600901019186174,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4621844927090129799,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        2,
+        2,
+        0,
+        2,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "96000-heavy-mlpfalse-held6",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4621844927090129799,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 2342303906145472847,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626404404287328530,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        66,
+        66,
+        0,
+        67,
+        1
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "96000-heavy-mlpfalse-held64",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626404404287328530,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 5500454204625902153,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 56,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4624087386027271873,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        182,
+        182,
+        0,
+        183,
+        1
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": false,
+      "name": "96000-heavy-mlpfalse-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 56,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4624087386027271873,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 5989313342482846825,
+      "samples": 12288
+    },
+    {
+      "block": 64,
+      "candidate_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4619610153893685095,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        5,
+        5,
+        0,
+        5,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "96000-heavy-mlptrue-held6",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 6,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 6,
+        "nan": 0,
+        "peak_bits": 4619610153893685095,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 3853371884097119738,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626434540586150492,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        62,
+        62,
+        0,
+        62,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "96000-heavy-mlptrue-held64",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 64,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 64,
+        "nan": 0,
+        "peak_bits": 4626434540586150492,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 2376378517600247420,
+      "samples": 12288
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 56,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4624210501191874214,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        178,
+        178,
+        0,
+        179,
+        1
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "96000-heavy-mlptrue-extended-lifecycle-controls",
+      "nonfinite": 0,
+      "rate": 96000,
+      "reference_final": {
+        "active": 56,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4624210501191874214,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 11267723748289342011,
+      "samples": 12288
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 4,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        48,
+        48,
+        0,
+        48,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": false,
+      "mlp": true,
+      "name": "mode-rate-reset-fast",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 4,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 0,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 2659544005643945549,
+      "samples": 60000
+    },
+    {
+      "block": 257,
+      "candidate_final": {
+        "active": 4,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4613419377962507063,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        30,
+        30,
+        0,
+        30,
+        0
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "mode-rate-reset-heavy",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 4,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4613419377962507063,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 14256911290986655131,
+      "samples": 60000
+    },
+    {
+      "block": 1024,
+      "candidate_final": {
+        "active": 2,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4608145418159909718,
+        "sustain": false,
+        "sustained": 0
+      },
+      "candidate_lifetime_totals": [
+        1104,
+        1104,
+        0,
+        1112,
+        8
+      ],
+      "counter_fields": [
+        "primary_failures",
+        "skipped_recoveries",
+        "recovery_attempts",
+        "guard_resets",
+        "last_iteration_rejections"
+      ],
+      "counter_invariant": true,
+      "diagnostic_mismatch_callbacks": 0,
+      "different_bits": 0,
+      "first_difference": null,
+      "heavy": true,
+      "mlp": true,
+      "name": "long-tail-heavy-20x-5seconds",
+      "nonfinite": 0,
+      "rate": 48000,
+      "reference_final": {
+        "active": 2,
+        "amp_clamp": 0,
+        "amp_maxiter": 0,
+        "held": 0,
+        "nan": 0,
+        "peak_bits": 4608145418159909718,
+        "sustain": false,
+        "sustained": 0
+      },
+      "reference_hash": 14481005998641381225,
+      "samples": 240000
+    }
+  ],
+  "limits": "Full f32 output bits and public guard/voice summaries at every callback. Final private circuit state is not directly observed; subsequent trajectory, rate reset and switches exercise restoration.",
+  "observed_last_iteration_rejections": 20,
+  "observed_primary_failures": 4615,
+  "observed_skipped_recoveries": 4615,
+  "shortcut_expected": true,
+  "total_samples": 998080
+}

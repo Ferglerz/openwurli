@@ -1,0 +1,2 @@
+mode-rate-reset-fast: EXACT (60000 samples)
+mode-rate-reset-heavy: EXACT (60000 samples)

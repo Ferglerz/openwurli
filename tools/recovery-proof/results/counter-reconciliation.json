@@ -1,0 +1,61 @@
+{
+  "scope": "Diagnostic lifetime accounting only; production/audio behavior unchanged. The 120,000 samples in the two affected cases reran with exact bits/public state and frozen source provenance. Original 53-case evidence retained. Full 8-case filter has no rate cases and is unchanged.",
+  "old_totals": [
+    4615,
+    4615,
+    0,
+    4635,
+    20
+  ],
+  "corrected_totals": [
+    4627,
+    4627,
+    0,
+    4647,
+    20
+  ],
+  "fields": [
+    "primary_failures",
+    "skipped_recoveries",
+    "recovery_attempts",
+    "guard_resets",
+    "last_iteration_rejections"
+  ],
+  "changed_cases": [
+    {
+      "name": "mode-rate-reset-fast",
+      "old": [
+        48,
+        48,
+        0,
+        48,
+        0
+      ],
+      "corrected": [
+        53,
+        53,
+        0,
+        53,
+        0
+      ]
+    },
+    {
+      "name": "mode-rate-reset-heavy",
+      "old": [
+        30,
+        30,
+        0,
+        30,
+        0
+      ],
+      "corrected": [
+        37,
+        37,
+        0,
+        37,
+        0
+      ]
+    }
+  ],
+  "corrected_counter_rule": "After a Rate event, count all new circuit lifetime counters including warmup and set previous to that snapshot. Post-render observations then add ordinary deltas. Reconstruction is no longer inferred solely from counter drops."
+}

@@ -783,6 +783,13 @@ impl WurliEngine {
         }
     }
 
+    /// Heavy solver lifetime events, including resets hidden by the older
+    /// generated-state diagnostic snapshot. Preserved across engine resets.
+    #[cfg(feature = "runtime-models")]
+    pub fn heavy_solver_diagnostics(&self) -> crate::power_amp::HeavySolverDiagnostics {
+        self.circuits.heavy.amp.solver_diagnostics()
+    }
+
     // ── Render ───────────────────────────────────────────────────────────
 
     /// Render `out.len()` mono samples through the full chain.

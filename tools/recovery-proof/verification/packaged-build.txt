@@ -1,0 +1,13 @@
+   Compiling bytemuck v1.25.2
+   Compiling zmij v1.0.23
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling melange-primitives v0.1.7 (https://github.com/hal0zer0/melange?rev=7ecb36c#7ecb36c7)
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.3
+   Compiling safe_arch v0.7.4
+   Compiling wide v0.7.33
+   Compiling recovery-candidate v0.7.0 (/private/tmp/openwurli-recovery-packaged-check/candidate)
+   Compiling recovery-reference v0.7.0 (/private/tmp/openwurli-recovery-packaged-check/reference)
+   Compiling recovery-proof v0.1.0 (/private/tmp/openwurli-recovery-packaged-check)
+    Finished `release` profile [optimized + debuginfo] target(s) in 10.04s
